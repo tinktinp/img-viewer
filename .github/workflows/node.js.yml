@@ -32,7 +32,8 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
-      - run: pnpm run iv:build --if-present
+      - run: pnpm run iv:build
+        name: build project
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
