@@ -1,0 +1,27 @@
+.checkerboard {
+    width: fit-content;
+    height: fit-content;
+}
+.checkerboard[data-style="magenta"] {
+    background-color: magenta;
+}
+
+.checkerboard[data-style="white"] {
+    background-color: white;
+}
+
+/* source for green and blue color hexes: https://www.g2.com/articles/chroma-key */
+
+.checkerboard[data-style="green"] {
+    background-color: #00b140;
+}
+
+.checkerboard[data-style="blue"] {
+    background-color: #0047bb;
+}
+
+.checkerboard[data-style="checkered"] {
+    background-color: magenta;
+    background-image: repeating-conic-gradient(#ccc 0% 25%, #888 0% 50%);
+    background-size: 30px 30px;
+}

@@ -1,0 +1,23 @@
+.imageDetails {
+    border-collapse: collapse;
+    padding: 0.25rem;
+
+    caption {
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+    }
+    tr:nth-child(odd) {
+        background-color: #eee;
+    }
+    th,
+    td {
+        padding: 0.5rem;
+    }
+    th {
+        text-align: left;
+    }
+    td {
+        font-family: monospace;
+        text-align: right;
+    }
+}

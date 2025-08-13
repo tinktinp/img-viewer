@@ -1,0 +1,29 @@
+.hexView {
+    text-align: left;
+    display: grid;
+    font-family: monospace;
+    white-space: pre;
+    column-gap: 1rem;
+    grid-template-columns: auto auto auto;
+    width: fit-content;
+    > :nth-child(even of .address),
+    > :nth-child(even of .hexColumnGroup),
+    > :nth-child(even of .ascii) {
+        background-color: #dee;
+    }
+}
+
+.address {
+    justify-self: right;
+}
+.hexColumnGroup {
+    display: flex;
+    gap: 2rem;
+}
+
+.hexColumn {
+}
+
+.ascii {
+    margin-left: 2rem;
+}
