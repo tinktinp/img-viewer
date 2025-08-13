@@ -10,6 +10,7 @@ export default defineConfig({
         distPath: {
             jsAsync: '.', // this is for the service worker
         },
+         assetPrefix: '/img-viewer/',
     },
     server: {
         htmlFallback: false, // we don't use any routing, so let's 404 instead
