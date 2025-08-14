@@ -5,12 +5,13 @@ import { useSelection } from './Selection';
 import { SettingsPanel } from './SettingsPanel';
 import { Download } from './Download';
 import { PaletteDetails } from './PaletteDetails';
+import { SequenceDetails } from './SequenceDetails';
 
 export interface SidebarProps {
     imageLibrary: ImageLibrary;
 }
 export function Sidebar({ imageLibrary }: SidebarProps) {
-    const { images: selectedImages, palettes: selectedPalettes } =
+    const { images: selectedImages, palettes: selectedPalettes, sequences: selectedSequences } =
         useSelection();
     return (
         <>
@@ -33,6 +34,14 @@ export function Sidebar({ imageLibrary }: SidebarProps) {
                     key={index}
                     imageLibrary={imageLibrary}
                     paletteIndex={index}
+                />
+            ))}
+
+            {selectedSequences.map((index) => (
+                <SequenceDetails
+                    key={index}
+                    imageLibrary={imageLibrary}
+                    sequenceIndex={index}
                 />
             ))}
         </>
