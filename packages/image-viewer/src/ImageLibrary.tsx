@@ -48,6 +48,7 @@ export function ImageLibrary({ imageLibrary }: ImageLibraryProps) {
                             imageLibrary={imageLibrary}
                             imageIndex={i}
                             zoom={zoom}
+                            type={'png'}
                         />
                     </ErrorBoundary>
                 </Checkerboard>

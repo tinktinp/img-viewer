@@ -8,6 +8,7 @@ export interface CachedPngImgProps {
     name: string;
     data: CacheData;
     width: number;
+    mimeType: string;
 }
 
 const preventDefaultAndBubble: MouseEventHandler<HTMLAnchorElement> = (e) => {
@@ -22,11 +23,12 @@ export function CachedPngImg({
     name,
     zoom,
     width,
+    mimeType = 'image/png',
 }: CachedPngImgProps) {
     const suggestedUrl = useMemo(() => makeCacheUrl(urlParts), [urlParts]);
     const urls = useCachedFile({
         data,
-        mimeType: 'image/png',
+        mimeType,
         url: suggestedUrl,
     });
 

@@ -143,6 +143,7 @@ const Sequence = ({ imageLibrary, sequenceIndex, zoom = 1 }: ImgProps) => {
                             imageLibrary={imageLibrary}
                             imageIndex={entry.itemIndex}
                             zoom={zoom}
+                            type={'png'}
                         />
                     </div>
                 );

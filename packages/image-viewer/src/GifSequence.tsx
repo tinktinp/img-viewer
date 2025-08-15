@@ -1,0 +1,53 @@
+import { memo, useEffect, useMemo, useRef } from 'react';
+import type { ImageLibrary } from './useImageLibrary';
+
+import Img from './Img';
+
+import styles from './Sequence.module.css';
+import type { SequenceScript } from './parse-image-header';
+import { useSettings } from './Settings';
+import { encodeSequenceAsGif } from './toGif';
+import CachedPngImg from './CachedPngImg';
+
+export interface ImgProps {
+    imageLibrary: ImageLibrary;
+    sequenceIndex: number;
+    zoom?: number;
+}
+
+const GifSequence = ({ imageLibrary, sequenceIndex, zoom = 1 }: ImgProps) => {
+    // const { animation } = useSettings();
+    // const ref = useRef<HTMLDivElement>(null);
+    const sequence = imageLibrary.sequences[sequenceIndex];
+    const name = sequence.name;
+    const { data, width } = useMemo(
+        () => encodeSequenceAsGif(imageLibrary, sequence),
+        [imageLibrary, sequence],
+    );
+
+    const paddedIndex = sequenceIndex.toString().padStart(3, '0');
+    const { extension, mimeType } = { extension: 'gif', mimeType: 'image/gif' };
+
+    const urlParts = [
+        'sequences',
+        paddedIndex,
+        `${paddedIndex}-${name}.${extension}`,
+    ];
+
+    if (!data) return null;
+
+    return (
+        <CachedPngImg
+            data={data}
+            mimeType={mimeType}
+            urlParts={urlParts}
+            name={name}
+            zoom={zoom}
+            width={width}
+        />
+    );
+};
+
+export const MemoSequence = memo(GifSequence);
+
+export default MemoSequence;

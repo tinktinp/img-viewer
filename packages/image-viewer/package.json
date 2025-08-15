@@ -23,6 +23,7 @@
     "fast-png": "^7.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-error-boundary": "^6.0.0"
+    "react-error-boundary": "^6.0.0",
+    "ts-gif": "^0.1.2"
   }
 }

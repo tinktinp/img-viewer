@@ -3,6 +3,7 @@ import { useSelection } from './Selection';
 import { encodeAsPng } from './toPng';
 import type { ImageLibrary } from './useImageLibrary';
 import { paletteToRgbArray, type Palettes } from './parse-image-header';
+import { encodeSequenceAsGif } from './toGif';
 
 export interface DownloadProps {
     imageLibrary: ImageLibrary;
@@ -29,6 +30,18 @@ export function Download({ imageLibrary }: DownloadProps) {
             downloadFile({
                 name: `${palette.paletteHeader.name}.act`,
                 type: 'application/data',
+                data,
+            });
+        }
+
+        for (let i = 0; i < selection.sequences.length; i++) {
+            const sequenceIndex = selection.sequences[i];
+                        const sequence = imageLibrary.sequences[sequenceIndex];
+
+            const { data } = encodeSequenceAsGif(imageLibrary, sequence);
+            downloadFile({
+                name: `${sequence.name}.gif`,
+                type: 'image/gif',
                 data,
             });
         }
