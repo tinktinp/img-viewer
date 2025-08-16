@@ -1,4 +1,3 @@
-
 export interface ImageFileHeader {
     imageCount: number;
     paletteCount: number;

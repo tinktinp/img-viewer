@@ -35,7 +35,7 @@ export function HexView({ buffer }: { buffer: ArrayBuffer }) {
                     </div>
                 </div>
                 <div className={styles.ascii}>
-                    {formatAscii(hexCol1)}  {formatAscii(hexCol2)}
+                    {formatAscii(hexCol1)} {formatAscii(hexCol2)}
                 </div>
             </Fragment>,
         );
@@ -47,7 +47,7 @@ export function HexView({ buffer }: { buffer: ArrayBuffer }) {
 function formatAscii(column: number[]) {
     return (
         column
-            .map((d) =>  d < 127 && d > 21 ? String.fromCharCode(d) : '.')
+            .map((d) => (d < 127 && d > 21 ? String.fromCharCode(d) : '.'))
             // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             //.map((c, i) => <div key={i}>{c}</div>)
             .join('')

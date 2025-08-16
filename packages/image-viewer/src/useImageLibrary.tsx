@@ -19,7 +19,10 @@ export interface ImageLibrary {
     scripts: SequenceScript[];
 }
 
-export function useImageLibrary(imgUrl: string | ArrayBuffer | undefined, filename: string) {
+export function useImageLibrary(
+    imgUrl: string | ArrayBuffer | undefined,
+    filename: string,
+) {
     const [imageLibrary, setImageLibrary] = useState<ImageLibrary>();
 
     useEffect(() => {

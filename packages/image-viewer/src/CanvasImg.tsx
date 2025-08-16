@@ -12,7 +12,6 @@ const Img = ({ imageLibrary, imageIndex, zoom = 1 }: ImgProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
     const imageData = useImageData(imageLibrary, imageIndex);
-    
 
     // TODO Look into this: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas#scaling_for_high_resolution_displays
     const onRef = useCallback((canvas: HTMLCanvasElement) => {
@@ -40,7 +39,6 @@ const Img = ({ imageLibrary, imageIndex, zoom = 1 }: ImgProps) => {
             canvas.style.width = `${canvas.width * zoom}px`;
             canvas.style.height = `${canvas.height * zoom}px`;
             canvas.style.imageRendering = 'pixelated';
-
 
             // Scale the context to ensure correct drawing operations
             // ctx.scale(dpr, dpr);

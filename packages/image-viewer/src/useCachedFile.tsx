@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
-import { cacheAndBlobUrl, type CachedUrls, type CacheProps } from './cacheFiles';
+import {
+    cacheAndBlobUrl,
+    type CachedUrls,
+    type CacheProps,
+} from './cacheFiles';
 
 export function useCachedFile({ data, url, mimeType }: CacheProps) {
     const [urls, setUrls] = useState<CachedUrls | undefined>(undefined);

@@ -1,8 +1,11 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-      "lib": ["ESNext", "WebWorker"],
-      "jsx": "react-jsx",
-  },
-  "include": ["src/service-worker.ts", "src/service-worker-static-routing.d.ts"]
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "lib": ["ESNext", "WebWorker"],
+        "jsx": "react-jsx"
+    },
+    "include": [
+        "src/service-worker.ts",
+        "src/service-worker-static-routing.d.ts"
+    ]
 }
