@@ -1,4 +1,9 @@
-import { AnimationToggle, TransparencyStylePicker, ZoomPicker } from './Settings';
+import {
+    AnimationToggle,
+    FpsComponent,
+    TransparencyStylePicker,
+    ZoomPicker,
+} from './Settings';
 import styles from './SettingsPanel.module.css';
 
 export function SettingsPanel() {
@@ -8,6 +13,7 @@ export function SettingsPanel() {
             <TransparencyStylePicker />
             <ZoomPicker />
             <AnimationToggle />
+            <FpsComponent />
         </div>
     );
 }

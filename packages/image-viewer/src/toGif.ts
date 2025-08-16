@@ -51,7 +51,13 @@ function calculateDimsAndPadding(sequence: SequenceScript) {
     let width = 0;
     let height = 0;
 
-    sequence.entries.forEach((entry) => {
+    const processEntry = (entry: Entry) => {
+        if (entry.sequence) {
+            entry.sequence.entries.forEach((entry2) => {
+                processEntry(entry2);
+            });
+            return;
+        }
         const h = entry.image?.imageHeader;
         if (!h) return;
 
@@ -66,6 +72,10 @@ function calculateDimsAndPadding(sequence: SequenceScript) {
 
         if (h.xSize + xOffset > width) width = h.xSize + xOffset;
         if (h.ySize + yOffset > height) height = h.ySize + yOffset;
+    };
+
+    sequence.entries.forEach((entry) => {
+        processEntry(entry);
     });
 
     return {
@@ -79,6 +89,7 @@ function calculateDimsAndPadding(sequence: SequenceScript) {
 export function encodeSequenceAsGif(
     imageLibrary: ImageLibrary,
     sequence: SequenceScript,
+    options: ConstructorParameters<typeof GifBuildingState>[0],
 ) {
     const dims = calculateDimsAndPadding(sequence);
 
@@ -86,22 +97,49 @@ export function encodeSequenceAsGif(
     const height = dims.paddingTop + dims.height;
     const { name } = sequence;
 
-    const firstEntry = sequence.entries[0];
+    let firstEntry = sequence.entries[0];
+    if (firstEntry?.sequence) {
+        firstEntry = firstEntry.sequence.entries[0];
+    }
+    if (!firstEntry?.image) {
+        return { data: new Uint8Array(), width: 0, height: 0 };
+    }
+
     const firstPalette =
-        imageLibrary.palettes[firstEntry.image!.imageHeader.palette];
+        imageLibrary.palettes[firstEntry.image.imageHeader.palette];
     const gifPalette = toGifPalette(firstPalette);
 
-    const { writer, resultBuffer } = createGifWriter(width, height, gifPalette);
+    const { writer, resultBuffer, state } = createGifWriter(
+        width,
+        height,
+        gifPalette,
+        options,
+    );
 
     sequence.entries.forEach((entry) => {
-        appendEntryToGif(
-            imageLibrary,
-            sequence,
-            entry,
-            writer,
-            dims.paddingLeft,
-            dims.paddingTop,
-        );
+        if (entry.image) {
+            appendEntryToGif(
+                imageLibrary,
+                sequence,
+                entry,
+                writer,
+                dims.paddingLeft,
+                dims.paddingTop,
+                state,
+            );
+        } else if (entry.sequence) {
+            entry.sequence.entries.forEach((entry) => {
+                appendEntryToGif(
+                    imageLibrary,
+                    sequence,
+                    entry,
+                    writer,
+                    dims.paddingLeft,
+                    dims.paddingTop,
+                    state,
+                );
+            });
+        }
     });
 
     const len = writer.end();
@@ -111,6 +149,18 @@ export function encodeSequenceAsGif(
     return { data: finalResult, width, height };
 }
 
+class GifBuildingState {
+    cumulativeTicks: number;
+    secondsPerFrame: number;
+    ticksPerFrame: number;
+
+    constructor({ fps = 54.70684, ticksPerFrame = 5 } = {}) {
+        this.cumulativeTicks = 0;
+        this.secondsPerFrame = 1 / fps;
+        this.ticksPerFrame = ticksPerFrame;
+    }
+}
+
 function appendEntryToGif(
     imageLibrary: ImageLibrary,
     sequence: SequenceScript,
@@ -118,6 +168,7 @@ function appendEntryToGif(
     writer: Writer,
     totalXOffset: number,
     totalYOffset: number,
+    state: GifBuildingState,
 ) {
     const image = entry.image!;
     const palette = imageLibrary.palettes[image.imageHeader.palette];
@@ -134,11 +185,38 @@ function appendEntryToGif(
         image.imageData.byteOffset,
         width * height,
     );
-    // apparently gifs use 1/100th of a second instead of ms (1/1000 of a second) that most things use
-    // const fps = 54; // too fast
-    const fps = 10;
-    const delay = Math.ceil((100 * entry.ticks) / fps);
-    console.log(image.imageHeader.name, { ticks: entry.ticks, delay});
+
+    // nacho tells me each "tick" should be 16ms
+    // leanyy mentions 1/54.70684 = 0.0183 (18.3ms)
+    // gifs delay is in 1/100th of a second, so increments of 10ms
+    // nacho's frame # = # of ticks gif has:
+    //  1:  10ms
+    //  2:  30ms
+    //  3:  50ms
+    //  4:  60ms
+    //  5:  80ms
+    //  6: 100ms
+    //  7: 110ms
+    //  8: 130ms
+    //  9: 150ms
+    // 10: 160ms
+    //
+    // For an animation who's IMG file has 1 tick in each frame, nacho's file has 80ms (5 ticks)
+    // If you used 18.3ms per frame, it would work out to 93ms
+
+    const previousTicks = state.cumulativeTicks;
+    state.cumulativeTicks += entry.ticks;
+
+    const { ticksPerFrame, secondsPerFrame, cumulativeTicks } = state;
+    const previousTotalTime = Math.round(
+        100 * ticksPerFrame * previousTicks * secondsPerFrame,
+    );
+    const newTotalTime = Math.round(
+        100 * ticksPerFrame * cumulativeTicks * secondsPerFrame,
+    );
+    const delay = newTotalTime - previousTotalTime;
+
+    // console.log(image.imageHeader.name, { ticks: entry.ticks, delay });
 
     writer.addFrame(totalXOffset + x, totalYOffset + y, width, height, data, {
         delay,
@@ -148,7 +226,12 @@ function appendEntryToGif(
     });
 }
 
-function createGifWriter(width: number, height: number, gifPalette: number[]) {
+function createGifWriter(
+    width: number,
+    height: number,
+    gifPalette: number[],
+    options?: ConstructorParameters<typeof GifBuildingState>[0],
+) {
     const maxByteLength = 100 * 1024 * 1024; // 100MB
 
     const resultBuffer = new Uint8Array(
@@ -163,7 +246,7 @@ function createGifWriter(width: number, height: number, gifPalette: number[]) {
             loop: 0, // 0 = loop forever
         },
     );
-    return { writer, resultBuffer };
+    return { writer, resultBuffer, state: new GifBuildingState(options) };
 }
 
 function toGifPalette(palette: Palettes) {

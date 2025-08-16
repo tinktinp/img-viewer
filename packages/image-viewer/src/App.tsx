@@ -11,6 +11,8 @@ import HexView from './HexView';
 import { clearCache } from './cacheFiles';
 import styles from './App.module.css';
 import { SequenceListLibrary } from './SequenceList';
+import { ScriptListLibrary } from './ScriptList';
+import { ForkMe } from './ForkMe';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
@@ -67,7 +69,7 @@ export function App() {
     const [selectedFile, setSelectedFile] = useState<
         UploadedFile | undefined
     >();
-    const imageLibrary = useImageLibrary(selectedFile?.buffer);
+    const imageLibrary = useImageLibrary(selectedFile?.buffer, selectedFile?.name || '');
 
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
@@ -106,6 +108,7 @@ export function App() {
     return (
         <SettingsProvider>
             <SelectionProvider ref={selectionRef}>
+                <ForkMe />
                 <div className="content">
                     <Layout>
                         <LayoutHeader>
@@ -157,8 +160,7 @@ export function App() {
                             </div>
                             <div>Sequences</div>
                             <div className={styles.itemsContainer}>
-
-                                 {imageLibrary && (
+                                {imageLibrary && (
                                     <SequenceListLibrary
                                         imageLibrary={imageLibrary}
                                     />
@@ -166,11 +168,11 @@ export function App() {
                             </div>
                             <div>Scripts</div>
                             <div className={styles.itemsContainer}>
-                                {imageLibrary?.scripts.map((seq, i) => (
-                                    <div key={`${i}_${seq.name}`}>
-                                        {seq.name}
-                                    </div>
-                                ))}
+                                {imageLibrary && (
+                                    <ScriptListLibrary
+                                        imageLibrary={imageLibrary}
+                                    />
+                                )}
                             </div>
                             {/* {imageLibrary && <HexView buffer={imageLibrary.buffer} />} */}
                         </LayoutMain>

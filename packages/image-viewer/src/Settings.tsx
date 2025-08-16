@@ -3,6 +3,7 @@ import {
     useCallback,
     useContext,
     useMemo,
+    useRef,
     useState,
 } from 'react';
 import type { WithChildren } from './WithChildren';
@@ -17,12 +18,16 @@ export interface Settings {
     transparencyStyle: TransparencyStyle;
     zoom: number;
     animation: boolean;
+    fps: number;
+    ticksPerFrame: number;
     setSettings: (newSettings: Partial<Settings>) => void;
 }
 const defaultSettings: Settings = {
     transparencyStyle: 'checkered',
     zoom: 1,
     animation: true,
+    fps: 54.70684,
+    ticksPerFrame: 5,
     setSettings: () => console.error('setSettings called without a provider!'),
 };
 
@@ -134,5 +139,43 @@ export function AnimationToggle() {
                 checked={animation}
             />
         </label>
+    );
+}
+
+export function FpsComponent() {
+    const { fps, ticksPerFrame, setSettings } = useSettings();
+    const fpsRef = useRef<HTMLInputElement | null>(null);
+    const tpfRef = useRef<HTMLInputElement | null>(null);
+
+    const updateSettings: React.ChangeEventHandler<HTMLInputElement> =
+        useCallback(() => {
+            if (!fpsRef.current || !tpfRef.current) return;
+            setSettings({
+                fps: Number.parseFloat(fpsRef.current.value),
+                ticksPerFrame: Number.parseFloat(tpfRef.current.value),
+            });
+        }, [setSettings]);
+
+    return (
+        <>
+            <label title="Frames Per Second">
+                FPS{' '}
+                <input
+                    ref={fpsRef}
+                    type="number"
+                    onChange={updateSettings}
+                    value={fps}
+                />
+            </label>
+            <label title="Ticks Per Frame">
+                TPF{' '}
+                <input
+                    ref={tpfRef}
+                    type="number"
+                    onChange={updateSettings}
+                    value={ticksPerFrame}
+                />
+            </label>
+        </>
     );
 }

@@ -4,12 +4,15 @@ import { encodeAsPng } from './toPng';
 import type { ImageLibrary } from './useImageLibrary';
 import { paletteToRgbArray, type Palettes } from './parse-image-header';
 import { encodeSequenceAsGif } from './toGif';
+import { useSettings } from './Settings';
 
 export interface DownloadProps {
     imageLibrary: ImageLibrary;
 }
 export function Download({ imageLibrary }: DownloadProps) {
     const selection = useSelection();
+    const { fps, ticksPerFrame } = useSettings();
+
     const handleClick = useCallback(() => {
         for (let i = 0; i < selection.images.length; i++) {
             const imageIndex = selection.images[i];
@@ -36,16 +39,34 @@ export function Download({ imageLibrary }: DownloadProps) {
 
         for (let i = 0; i < selection.sequences.length; i++) {
             const sequenceIndex = selection.sequences[i];
-                        const sequence = imageLibrary.sequences[sequenceIndex];
+            const sequence = imageLibrary.sequences[sequenceIndex];
 
-            const { data } = encodeSequenceAsGif(imageLibrary, sequence);
+            const { data } = encodeSequenceAsGif(imageLibrary, sequence, {
+                fps,
+                ticksPerFrame,
+            });
             downloadFile({
                 name: `${sequence.name}.gif`,
                 type: 'image/gif',
                 data,
             });
         }
-    }, [selection, imageLibrary]);
+
+        for (let i = 0; i < selection.scripts.length; i++) {
+            const scriptIndex = selection.scripts[i];
+            const script = imageLibrary.scripts[scriptIndex];
+
+            const { data } = encodeSequenceAsGif(imageLibrary, script, {
+                fps,
+                ticksPerFrame,
+            });
+            downloadFile({
+                name: `${script.name}.gif`,
+                type: 'image/gif',
+                data,
+            });
+        }
+    }, [selection, imageLibrary, fps, ticksPerFrame]);
 
     return (
         <button type="button" onClick={handleClick}>

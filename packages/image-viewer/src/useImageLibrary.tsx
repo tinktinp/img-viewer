@@ -10,6 +10,7 @@ import {
 } from './parse-image-header';
 
 export interface ImageLibrary {
+    filename: string;
     buffer: ArrayBuffer;
     libraryHeader: ImageFileHeader;
     images: Image[];
@@ -18,7 +19,7 @@ export interface ImageLibrary {
     scripts: SequenceScript[];
 }
 
-export function useImageLibrary(imgUrl: string | ArrayBuffer | undefined) {
+export function useImageLibrary(imgUrl: string | ArrayBuffer | undefined, filename: string) {
     const [imageLibrary, setImageLibrary] = useState<ImageLibrary>();
 
     useEffect(() => {
@@ -35,6 +36,7 @@ export function useImageLibrary(imgUrl: string | ArrayBuffer | undefined) {
 
             const { result: libraryHeader } = parseImageFileHeader(img);
             const imageLibrary: ImageLibrary = {
+                filename,
                 libraryHeader,
                 buffer: img,
                 images: [],
@@ -119,7 +121,7 @@ export function useImageLibrary(imgUrl: string | ArrayBuffer | undefined) {
 
             setImageLibrary(imageLibrary as ImageLibrary);
         })();
-    }, [imgUrl]);
+    }, [imgUrl, filename]);
 
     return imageLibrary;
 }

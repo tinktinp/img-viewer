@@ -11,6 +11,7 @@ export interface ImgProps {
     imageLibrary: ImageLibrary;
     sequenceIndex: number;
     zoom?: number;
+    script?: boolean;
 }
 
 function calculateDimsAndPadding(sequence: SequenceScript) {

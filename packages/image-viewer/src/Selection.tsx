@@ -12,6 +12,7 @@ export interface Selection {
     images: number[];
     palettes: number[];
     sequences: number[];
+    scripts: number[];
     addSelection: (toAdd: Partial<Selection>) => void;
     removeSelection: (toRemove: Partial<Selection>) => void;
     clearSelection: () => void;
@@ -21,6 +22,7 @@ const defaultSelection: Selection = {
     images: [],
     palettes: [],
     sequences: [],
+    scripts: [],
     addSelection() {
         throw new Error('Not implemented');
     },
@@ -56,6 +58,7 @@ export function SelectionProvider({
                         ...selection.sequences,
                         ...(toAdd.sequences || []),
                     ],
+                    scripts: [...selection.scripts, ...(toAdd.scripts || [])],
                 });
             },
             removeSelection: (toRemove: Partial<Selection>) => {
@@ -69,6 +72,9 @@ export function SelectionProvider({
                     ),
                     sequences: selection.sequences.filter(
                         (v) => !toRemove.sequences?.includes(v),
+                    ),
+                    scripts: selection.scripts.filter(
+                        (v) => !toRemove.scripts?.includes(v),
                     ),
                 });
             },
