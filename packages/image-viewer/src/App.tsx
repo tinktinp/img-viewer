@@ -65,11 +65,15 @@ function sortNames(a: string, b: string) {
 
 export function App() {
     const selectionRef = useRef<Selection>(null);
+    const [allFiles, setAllFiles] = useState<FileList>([]);
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [selectedFile, setSelectedFile] = useState<
         UploadedFile | undefined
     >();
-    const imageLibrary = useImageLibrary(selectedFile?.buffer, selectedFile?.name || '');
+    const imageLibrary = useImageLibrary(
+        selectedFile?.buffer,
+        selectedFile?.name || '',
+    );
 
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
@@ -77,6 +81,7 @@ export function App() {
 
             const uploadedFiles = [];
             const files: FileList = e.target.files;
+            setAllFiles(files);
             for (const file of files) {
                 if (file.name.toLowerCase().endsWith('.img')) {
                     uploadedFiles.push({
@@ -140,47 +145,59 @@ export function App() {
                             >
                                 THERE IS NO KNOWLEDGE THAT IS NOT POWER
                             </div>
+                            {allFiles.length > 0 && !files.length && (
+                                <>
+                                    <div className={styles.noFile}>
+                                        There is no supported file that has been
+                                        loaded.
+                                    </div>
+
+                                    <div className={styles.noFile}>
+                                        {' '}
+                                        Only IMG files are supported.
+                                    </div>
+
+                                    <div className={styles.noFile}>
+                                        You must consult the Elder Gods.
+                                    </div>
+                                </>
+                            )}
                         </LayoutHeader>
-                        <LayoutMain>
-                            <div>Images</div>
-                            <div className={styles.itemsContainer}>
-                                {imageLibrary && (
+
+                        {imageLibrary && (
+                            <LayoutMain>
+                                <div>Images</div>
+                                <div className={styles.itemsContainer}>
                                     <ImageLibrary
                                         imageLibrary={imageLibrary}
                                     ></ImageLibrary>
-                                )}
-                            </div>
-                            <div>Palettes</div>
-                            <div className={styles.itemsContainer}>
-                                {imageLibrary && (
+                                </div>
+                                <div>Palettes</div>
+                                <div className={styles.itemsContainer}>
                                     <PaletteComponent
                                         imageLibrary={imageLibrary}
                                     />
-                                )}
-                            </div>
-                            <div>Sequences</div>
-                            <div className={styles.itemsContainer}>
-                                {imageLibrary && (
+                                </div>
+                                <div>Sequences</div>
+                                <div className={styles.itemsContainer}>
                                     <SequenceListLibrary
                                         imageLibrary={imageLibrary}
                                     />
-                                )}
-                            </div>
-                            <div>Scripts</div>
-                            <div className={styles.itemsContainer}>
-                                {imageLibrary && (
+                                </div>
+                                <div>Scripts</div>
+                                <div className={styles.itemsContainer}>
                                     <ScriptListLibrary
                                         imageLibrary={imageLibrary}
                                     />
-                                )}
-                            </div>
-                            {/* {imageLibrary && <HexView buffer={imageLibrary.buffer} />} */}
-                        </LayoutMain>
-                        <LayoutSidebar>
-                            {imageLibrary && (
+                                </div>
+                                {/*  <HexView buffer={imageLibrary.buffer} />*/}
+                            </LayoutMain>
+                        )}
+                        {imageLibrary && (
+                            <LayoutSidebar>
                                 <Sidebar imageLibrary={imageLibrary} />
-                            )}
-                        </LayoutSidebar>
+                            </LayoutSidebar>
+                        )}
                     </Layout>
                 </div>
             </SelectionProvider>

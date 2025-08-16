@@ -85,9 +85,18 @@ $ pnpm install
 $ pnpm run dev
 ```
 
+## TODO
+
+A rough list of future enhancements.
+
+- support BDB/BDD files
+- fix remaining crashes
+- fix files that are not decoded correctly (some animation sizes seem to be wrong / huge)
+
 ## Special Thanks
 
 - ermaccer
   - I used ermaccer's [midway.img](https://github.com/ermaccer/midway.img) as a reference at times, especially for working out how to convert the palettes from 15 bit to 24 bit
 - leanny
 - nacho
+- the Tablet Of Knowledge

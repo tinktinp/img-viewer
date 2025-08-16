@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
+import { ErrorBoundary } from 'react-error-boundary';
 
 const rootEl = document.querySelector('#root');
 if (!rootEl) {
@@ -10,9 +11,20 @@ if (!rootEl) {
 const root = createRoot(rootEl);
 root.render(
     <StrictMode>
-        <App />
+        <ErrorBoundary fallbackRender={Fallback}>
+            <App />
+        </ErrorBoundary>
     </StrictMode>,
 );
+
+function Fallback() {
+    return (
+        <div style={{ color: 'darkred' }}>
+            It seems I have no power here. Consult the Console in Devtools
+            (F12), and file a GitHub issue.
+        </div>
+    );
+}
 
 const registerServiceWorker = async () => {
     if ('serviceWorker' in navigator) {

@@ -3,3 +3,10 @@
     flex-wrap: wrap;
     gap: 8px;
 }
+
+.noFile {
+    padding: 1rem;
+    color: darkred;
+    font-weight: bold;
+    font-style: italic;
+}

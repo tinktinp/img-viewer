@@ -1,19 +1,16 @@
-const styles = {
-    top: 0,
-    left: 0,
-    position: 'absolute',
-} as const;
+import forkMe from './forkme_left_darkblue_121621.png';
+import styles from './ForkMe.module.css';
 
 export function ForkMe() {
     return (
         <a href="https://github.com/tinktinp/img-viewer">
             <img
-                style={styles}
+                className={styles.forkMe}
                 loading="lazy"
                 decoding="async"
                 width="125"
                 height="125"
-                src="https://github.blog/wp-content/uploads/2008/12/forkme_left_darkblue_121621.png"
+                src={forkMe}
                 alt="Fork me on GitHub"
             />
         </a>
