@@ -1,0 +1,18 @@
+.summary {
+    td {
+        text-align: left;
+    }
+}
+
+.details {
+    display: none;
+
+    > td {
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+    }
+}
+
+.summary:has(details[open]) + .details {
+    display: table-row;
+}

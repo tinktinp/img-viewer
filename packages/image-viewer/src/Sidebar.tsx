@@ -11,8 +11,12 @@ export interface SidebarProps {
     imageLibrary: ImageLibrary;
 }
 export function Sidebar({ imageLibrary }: SidebarProps) {
-    const { images: selectedImages, palettes: selectedPalettes, sequences: selectedSequences } =
-        useSelection();
+    const {
+        images: selectedImages,
+        palettes: selectedPalettes,
+        sequences: selectedSequences,
+        scripts: selectedScripts,
+    } = useSelection();
     return (
         <>
             <Download imageLibrary={imageLibrary} />
@@ -42,6 +46,15 @@ export function Sidebar({ imageLibrary }: SidebarProps) {
                     key={index}
                     imageLibrary={imageLibrary}
                     sequenceIndex={index}
+                />
+            ))}
+
+            {selectedScripts.map((index) => (
+                <SequenceDetails
+                    key={index}
+                    imageLibrary={imageLibrary}
+                    sequenceIndex={index}
+                    script
                 />
             ))}
         </>

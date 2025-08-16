@@ -6,18 +6,21 @@ import { EntriesDetails, EntryDetails } from './EntryDetails';
 export function SequenceDetails({
     imageLibrary,
     sequenceIndex,
+    script = false,
 }: {
     imageLibrary: ImageLibrary;
     sequenceIndex: number;
+    script?: boolean;
 }) {
-    if (!imageLibrary.sequences[sequenceIndex]) {
+    const theList = script ? imageLibrary.scripts : imageLibrary.sequences;
+    if (!theList[sequenceIndex]) {
         return;
     }
     const { libraryHeader } = imageLibrary;
-    const sequence: SequenceScript = imageLibrary.sequences[sequenceIndex];
+    const sequence: SequenceScript = theList[sequenceIndex];
     return (
         <table className={styles.imageDetails}>
-            <caption>Sequence Details</caption>
+            <caption>{script ? 'Script' : 'Sequence'} Details</caption>
             <tbody>
                 <tr>
                     <th scope="row">Name</th>
@@ -58,7 +61,7 @@ export function SequenceDetails({
                             sequence.damageTable4,
                             sequence.damageTable5,
                         ]
-                            .map((bs) => `${bs?.toString(10)}`)
+                            .map((bs) => `${(bs ?? '').toString(10)}`)
                             .join(' ')}
                     </td>
                 </tr>

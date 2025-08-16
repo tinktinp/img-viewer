@@ -185,7 +185,6 @@ export const paletteHeaderFormat = {
     _unused: fields.uint16,
 } as const;
 
-
 export function sizesFromVersion(version: number) {
     return {
         oldImage: 28, // 42?
@@ -562,7 +561,7 @@ export function parseSequenceScriptHeader(
     }
 
     sequenceScript.entries = entries.reverse();
-    console.log(sequenceScript);
+    // console.log(sequenceScript);
     sequenceScript.startX = sequenceScript.startX ?? 0;
     sequenceScript.startY = sequenceScript.startY ?? 0;
 
