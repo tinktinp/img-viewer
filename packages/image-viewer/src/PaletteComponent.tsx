@@ -1,14 +1,11 @@
 import { useCallback, useMemo } from 'react';
-
+import CachedPngImg from './CachedPngImg';
 import type { ImageLibraryProps } from './ImageLibrary';
+import styles from './ImageLibrary.module.css';
+import type { Palettes } from './parse-image-header';
 import { useSelection } from './Selection';
 import { useSettings } from './Settings';
-import type { Palettes } from './parse-image-header';
 import { encodePaletteAsPng } from './toPng';
-
-import CachedPngImg from './CachedPngImg';
-
-import styles from './ImageLibrary.module.css';
 
 export function PaletteComponent({ imageLibrary }: ImageLibraryProps) {
     const { zoom } = useSettings();

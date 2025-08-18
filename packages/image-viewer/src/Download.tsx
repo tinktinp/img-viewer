@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
+import { type Palettes, paletteToRgbArray } from './parse-image-header';
 import { useSelection } from './Selection';
+import { useSettings } from './Settings';
+import { encodeSequenceAsGif } from './toGif';
 import { encodeAsPng } from './toPng';
 import type { ImageLibrary } from './useImageLibrary';
-import { paletteToRgbArray, type Palettes } from './parse-image-header';
-import { encodeSequenceAsGif } from './toGif';
-import { useSettings } from './Settings';
 
 export interface DownloadProps {
     imageLibrary: ImageLibrary;

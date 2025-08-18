@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { Checkerboard } from './Checkerboard';
-import type { ImageLibrary } from './useImageLibrary';
-import Img from './Img';
-import { useSettings } from './Settings';
-import { useSelection } from './Selection';
 import { ErrorBoundary } from 'react-error-boundary';
-
+import { Checkerboard } from './Checkerboard';
 import styles from './ImageLibrary.module.css';
+import Img from './Img';
+import { useSelection } from './Selection';
+import { useSettings } from './Settings';
+import type { ImageLibrary } from './useImageLibrary';
 
 export interface ImageLibraryProps {
     imageLibrary: ImageLibrary;

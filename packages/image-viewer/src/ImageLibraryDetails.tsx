@@ -1,5 +1,5 @@
-import type { ImageLibrary } from './useImageLibrary';
 import styles from './ImageLibraryDetails.module.css';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function ImageLibraryDetails({
     imageLibrary,

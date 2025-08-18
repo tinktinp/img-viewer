@@ -1,5 +1,5 @@
-import type { ImageLibrary } from './useImageLibrary';
 import styles from './ImageDetails.module.css';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function PaletteDetails({
     imageLibrary,

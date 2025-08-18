@@ -1,11 +1,10 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
-import type { ImageLibrary } from './useImageLibrary';
-
 import Img from './Img';
+import type { SequenceScript } from './parse-image-header';
 
 import styles from './Sequence.module.css';
-import type { SequenceScript } from './parse-image-header';
 import { useSettings } from './Settings';
+import type { ImageLibrary } from './useImageLibrary';
 
 export interface ImgProps {
     imageLibrary: ImageLibrary;

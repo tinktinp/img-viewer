@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { ImageLibrary } from './useImageLibrary';
 import { imageAndPaletteToImageData } from './parse-image-header';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function useImageData(
     imageLibrary: ImageLibrary | undefined,

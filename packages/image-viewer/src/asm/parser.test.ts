@@ -1,5 +1,5 @@
-import { expect, test } from '@rstest/core';
 import fs from 'node:fs';
+import { expect, test } from '@rstest/core';
 import { parseAsmLine, parseLiteralDataEntries } from './parser';
 
 const someBytesAsm = fs.readFileSync(__dirname + '/fixture/someBytes.asm', {

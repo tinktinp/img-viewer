@@ -1,6 +1,6 @@
-import { useMemo, type MouseEventHandler } from 'react';
+import { type MouseEventHandler, useMemo } from 'react';
+import { type CacheData, makeCacheUrl } from './cacheFiles';
 import useCachedFile from './useCachedFile';
-import { makeCacheUrl, type CacheData } from './cacheFiles';
 
 export interface CachedPngImgProps {
     zoom: number;

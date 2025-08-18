@@ -1,13 +1,12 @@
 import { memo, useEffect, useMemo, useRef } from 'react';
-import type { ImageLibrary } from './useImageLibrary';
+import CachedPngImg from './CachedPngImg';
 
 import Img from './Img';
-
-import styles from './Sequence.module.css';
 import type { SequenceScript } from './parse-image-header';
+import styles from './Sequence.module.css';
 import { useSettings } from './Settings';
 import { encodeSequenceAsGif } from './toGif';
-import CachedPngImg from './CachedPngImg';
+import type { ImageLibrary } from './useImageLibrary';
 
 export interface ImgProps {
     imageLibrary: ImageLibrary;

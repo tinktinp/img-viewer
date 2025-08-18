@@ -1,5 +1,5 @@
 const asmLineMatcher =
-    /^(?<label>[\w$?]+:?)?(?:\s+(?<instruction>[.$\w]+)?)?\s*(?<args>(?:[-~:|\[\]/\w,()*.@<>+_$=?]|(?:"[^"]*")|(?:'[^']*')|(?:, +)|else +|if +|\s+)*)?\s*(?<comment>;.*)?$/;
+    /^(?<label>[\w$?]+:?)?(?:\s+(?<instruction>[.$\w]+)?)?\s*(?<args>(?:[-~:|[\]/\w,()*.@<>+_$=?]|(?:"[^"]*")|(?:'[^']*')|(?:, +)|else +|if +|\s+)*)?\s*(?<comment>;.*)?$/;
 
 const asmWholeLineComment = /^\s*[;*]/;
 const asmWhitespaceLine = /^\s+$/;

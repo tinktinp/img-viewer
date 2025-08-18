@@ -1,6 +1,6 @@
-import { withClass } from './WithChildren';
 import styles from './Checkerboard.module.css';
 import { useSettings } from './Settings';
+import { withClass } from './WithChildren';
 
 export const InnerCheckerboard = withClass(styles.checkerboard);
 

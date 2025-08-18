@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import type { Palettes, SequenceScript, Image } from './parse-image-header';
-import { parseImageFileHeader, type ImageFileHeader } from './parse-image';
+import { useEffect, useState } from 'react';
+import { type ImageFileHeader, parseImageFileHeader } from './parse-image';
+import type { Image, Palettes, SequenceScript } from './parse-image-header';
 import {
     type ImageHeader,
     parseBufferScriptHeaders,

@@ -1,5 +1,5 @@
-import forkMe from './forkme_left_darkblue_121621.png';
 import styles from './ForkMe.module.css';
+import forkMe from './forkme_left_darkblue_121621.png';
 
 export function ForkMe() {
     return (

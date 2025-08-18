@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react';
-import type { ImageLibrary } from './useImageLibrary';
-import { encodeAsPng } from './toPng';
 import CachedPngImg from './CachedPngImg';
 import { encodeAsGif } from './toGif';
+import { encodeAsPng } from './toPng';
+import type { ImageLibrary } from './useImageLibrary';
 
 export type ImageType = 'png' | 'gif';
 

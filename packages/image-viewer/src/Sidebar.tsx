@@ -1,11 +1,11 @@
-import type { ImageLibrary } from './useImageLibrary';
+import { Download } from './Download';
 import { ImageDetails } from './ImageDetails';
 import { ImageLibraryDetails } from './ImageLibraryDetails';
-import { useSelection } from './Selection';
-import { SettingsPanel } from './SettingsPanel';
-import { Download } from './Download';
 import { PaletteDetails } from './PaletteDetails';
+import { useSelection } from './Selection';
 import { SequenceDetails } from './SequenceDetails';
+import { SettingsPanel } from './SettingsPanel';
+import type { ImageLibrary } from './useImageLibrary';
 
 export interface SidebarProps {
     imageLibrary: ImageLibrary;

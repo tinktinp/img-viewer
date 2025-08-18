@@ -1,6 +1,6 @@
+import { Fragment, useMemo } from 'react';
 import type { JSX } from 'react/jsx-runtime';
 import styles from './HexView.module.css';
-import { Fragment, useMemo } from 'react';
 
 function preventDefault(e: { preventDefault: () => void }) {
     e.preventDefault();

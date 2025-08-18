@@ -1,7 +1,7 @@
-import type { ImageLibrary } from './useImageLibrary';
+import { EntriesDetails, EntryDetails } from './EntryDetails';
 import styles from './ImageDetails.module.css';
 import type { SequenceScript } from './parse-image-header';
-import { EntriesDetails, EntryDetails } from './EntryDetails';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function SequenceDetails({
     imageLibrary,

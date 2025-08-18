@@ -1,18 +1,17 @@
-import { useCallback, useRef, useState, type ChangeEventHandler } from 'react';
-
-import { useImageLibrary } from './useImageLibrary';
-import { Layout, LayoutHeader, LayoutMain, LayoutSidebar } from './Layout';
-import { SettingsProvider } from './Settings';
-import { SelectionProvider, type Selection } from './Selection';
-import { Sidebar } from './Sidebar';
-import { ImageLibrary } from './ImageLibrary';
-import { PaletteComponent } from './PaletteComponent';
-import HexView from './HexView';
-import { clearCache } from './cacheFiles';
+import { type ChangeEventHandler, useCallback, useRef, useState } from 'react';
 import styles from './App.module.css';
-import { SequenceListLibrary } from './SequenceList';
-import { ScriptListLibrary } from './ScriptList';
+import { clearCache } from './cacheFiles';
 import { ForkMe } from './ForkMe';
+import HexView from './HexView';
+import { ImageLibrary } from './ImageLibrary';
+import { Layout, LayoutHeader, LayoutMain, LayoutSidebar } from './Layout';
+import { PaletteComponent } from './PaletteComponent';
+import { ScriptListLibrary } from './ScriptList';
+import { type Selection, SelectionProvider } from './Selection';
+import { SequenceListLibrary } from './SequenceList';
+import { SettingsProvider } from './Settings';
+import { Sidebar } from './Sidebar';
+import { useImageLibrary } from './useImageLibrary';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {

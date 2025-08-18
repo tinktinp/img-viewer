@@ -3,8 +3,8 @@ import {
     type IndexedColors,
     type ImageData as PngImageData,
 } from 'fast-png';
+import { type Palettes, paletteToRgbArray } from './parse-image-header';
 import type { ImageLibrary } from './useImageLibrary';
-import { paletteToRgbArray, type Palettes } from './parse-image-header';
 
 export function encodeAsPng(
     imageLibrary: ImageLibrary,

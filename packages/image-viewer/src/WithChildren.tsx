@@ -1,9 +1,9 @@
 import React, {
-    useMemo,
     type ClassAttributes,
     type HTMLAttributes,
     type HTMLElementType,
     type ReactNode,
+    useMemo,
 } from 'react';
 import type { JSX } from 'react/jsx-runtime';
 

@@ -1,12 +1,11 @@
 import { Writer } from 'ts-gif';
-
-import type { ImageLibrary } from './useImageLibrary';
 import {
-    paletteToRgbArray,
     type Entry,
     type Palettes,
+    paletteToRgbArray,
     type SequenceScript,
 } from './parse-image-header';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function encodeAsGif(
     imageLibrary: ImageLibrary,

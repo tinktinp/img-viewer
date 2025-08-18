@@ -1,13 +1,12 @@
 import { useCallback } from 'react';
-import { Checkerboard } from './Checkerboard';
-import type { ImageLibrary } from './useImageLibrary';
-import { useSettings } from './Settings';
-import { useSelection } from './Selection';
 import { ErrorBoundary } from 'react-error-boundary';
-
-import styles from './ImageLibrary.module.css';
-import Sequence from './Sequence';
+import { Checkerboard } from './Checkerboard';
 import GifSequence from './GifSequence';
+import styles from './ImageLibrary.module.css';
+import { useSelection } from './Selection';
+import Sequence from './Sequence';
+import { useSettings } from './Settings';
+import type { ImageLibrary } from './useImageLibrary';
 
 export interface ImageLibraryProps {
     imageLibrary: ImageLibrary;

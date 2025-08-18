@@ -1,10 +1,9 @@
-import type { ImageLibrary } from './useImageLibrary';
+import type { FC, ReactNode } from 'react';
+import { Fragment } from 'react/jsx-runtime';
+import styles from './EntryDetails.module.css';
 import imageDetailsStyles from './ImageDetails.module.css';
 import type { Entry } from './parse-image-header';
-import { Fragment } from 'react/jsx-runtime';
-
-import styles from './EntryDetails.module.css';
-import type { FC, ReactNode } from 'react';
+import type { ImageLibrary } from './useImageLibrary';
 
 export function EntryDetails({
     entry,

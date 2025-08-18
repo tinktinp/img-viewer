@@ -1,10 +1,10 @@
 import {
     ByteStringField,
     fields,
-    parseFromFormat,
     type ImageFileHeader,
     type ObjectParsedFromFormat,
     type ParseFromFormatResult,
+    parseFromFormat,
 } from './parse-image';
 
 export const imageHeaderFormat = {
