@@ -135,7 +135,7 @@ export function imageToPng(
 
     const png = encodeBuffersAsPng(
         decompressedImageData.slice(0, width * height),
-        new Uint8Array(paletteData).reverse(), // TODO: move reverse into encodeBufferAsPng or find a way to remove it
+        new Uint8Array(paletteData.slice(0)).reverse(), // TODO: move reverse into encodeBufferAsPng or find a way to remove it
         width,
         height,
     );
