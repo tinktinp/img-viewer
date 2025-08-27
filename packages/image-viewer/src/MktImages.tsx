@@ -172,7 +172,7 @@ const MktDrawPalettePng = ({
 
         return encodeBuffersAsPng(
             imageForPalette,
-            new Uint8Array(palette).reverse(),
+            new Uint8Array(palette).toReversed(),
             16,
             imageForPalette.byteLength / 16,
         );

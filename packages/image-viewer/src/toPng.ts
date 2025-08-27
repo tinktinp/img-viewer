@@ -73,7 +73,7 @@ export function encodeBuffersAsPng(
         data,
         depth: 8,
         channels: 1,
-        palette: pngPalette.reverse(),
+        palette: pngPalette.toReversed(),
     };
 
     const result = encode(pngImageData);
