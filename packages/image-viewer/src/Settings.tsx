@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <explanation> */
 import {
     createContext,
     useCallback,
@@ -7,6 +8,7 @@ import {
     useState,
 } from 'react';
 import type { WithChildren } from './WithChildren';
+import type { LiteralDataEntry } from './asm/parser';
 
 export type TransparencyStyle =
     | 'magenta'
@@ -20,6 +22,11 @@ export interface Settings {
     animation: boolean;
     fps: number;
     ticksPerFrame: number;
+    mktPalette: [number, number];
+    mktPalettes: {
+        name: string;
+        palettes: LiteralDataEntry[];
+    }[];
     setSettings: (newSettings: Partial<Settings>) => void;
 }
 const defaultSettings: Settings = {
@@ -28,6 +35,8 @@ const defaultSettings: Settings = {
     animation: true,
     fps: 54.70684,
     ticksPerFrame: 5,
+    mktPalette: [0, 0],
+    mktPalettes: [],
     setSettings: () => console.error('setSettings called without a provider!'),
 };
 
@@ -177,5 +186,42 @@ export function FpsComponent() {
                 />
             </label>
         </>
+    );
+}
+
+export function MktPalettePicker() {
+    const { mktPalettes, mktPalette, setSettings } = useSettings();
+
+    const updateSettings: React.ChangeEventHandler<HTMLSelectElement> =
+        useCallback(
+            (e) => {
+                setSettings({
+                    mktPalette: JSON.parse(e.target.value),
+                });
+            },
+            [setSettings],
+        );
+
+    return (
+        <label>
+            Palette{' '}
+            <select
+                onChange={updateSettings}
+                value={JSON.stringify(mktPalette)}
+            >
+                {mktPalettes.map((paletteFile, pfIdx) => (
+                    <optgroup key={pfIdx} label={paletteFile.name}>
+                        {paletteFile.palettes.map((palette, pIdx) => (
+                            <option
+                                value={JSON.stringify([pfIdx, pIdx])}
+                                key={`${pfIdx}_${pIdx}`}
+                            >
+                                {palette.label}
+                            </option>
+                        ))}
+                    </optgroup>
+                ))}
+            </select>
+        </label>
     );
 }

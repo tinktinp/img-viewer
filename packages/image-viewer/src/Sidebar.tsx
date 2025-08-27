@@ -8,9 +8,27 @@ import { SettingsPanel } from './SettingsPanel';
 import type { ImageLibrary } from './useImageLibrary';
 
 export interface SidebarProps {
-    imageLibrary: ImageLibrary;
+    imageLibrary?: ImageLibrary;
 }
 export function Sidebar({ imageLibrary }: SidebarProps) {
+    const mode = imageLibrary ? 'img' : 'mkt';
+    return (
+        <>
+            {imageLibrary && <Download imageLibrary={imageLibrary} />}
+            <SettingsPanel mode={mode} />
+            {imageLibrary && (
+                <ImageLibrarySidebar imageLibrary={imageLibrary} />
+            )}
+        </>
+    );
+}
+
+export interface ImageLibrarySidebarProps {
+    imageLibrary: ImageLibrary;
+}
+export function ImageLibrarySidebar({
+    imageLibrary,
+}: ImageLibrarySidebarProps) {
     const {
         images: selectedImages,
         palettes: selectedPalettes,
@@ -19,8 +37,6 @@ export function Sidebar({ imageLibrary }: SidebarProps) {
     } = useSelection();
     return (
         <>
-            <Download imageLibrary={imageLibrary} />
-            <SettingsPanel />
             <ImageLibraryDetails
                 imageLibrary={imageLibrary}
             ></ImageLibraryDetails>

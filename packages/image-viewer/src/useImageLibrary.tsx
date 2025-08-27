@@ -26,7 +26,10 @@ export function useImageLibrary(
     const [imageLibrary, setImageLibrary] = useState<ImageLibrary>();
 
     useEffect(() => {
-        if (!imgUrl) return;
+        if (!imgUrl) {
+            setImageLibrary(undefined);
+            return;
+        }
 
         (async function innerUseImageData() {
             let img: ArrayBuffer;

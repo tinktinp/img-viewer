@@ -10,8 +10,10 @@ import { ScriptListLibrary } from './ScriptList';
 import { type Selection, SelectionProvider } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
-import { Sidebar } from './Sidebar';
+import { ImageLibrarySidebar, Sidebar } from './Sidebar';
 import { useImageLibrary } from './useImageLibrary';
+import { filterFiles, type CategorizedFiles } from './asm/filterFiles';
+import { MktImages } from './MktImages';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
@@ -64,8 +66,9 @@ function sortNames(a: string, b: string) {
 
 export function App() {
     const selectionRef = useRef<Selection>(null);
-    const [allFiles, setAllFiles] = useState<FileList>([]);
+    const [allFiles, setAllFiles] = useState<FileList>();
     const [files, setFiles] = useState<UploadedFile[]>([]);
+    const [mktFiles, setMktFiles] = useState<CategorizedFiles>();
     const [selectedFile, setSelectedFile] = useState<
         UploadedFile | undefined
     >();
@@ -74,35 +77,42 @@ export function App() {
         selectedFile?.name || '',
     );
 
+    const attFileIsSelected = Boolean(
+        mktFiles && selectedFile?.name.toLowerCase().endsWith('att'),
+    );
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
             if (e.target.files === null) return;
 
-            const uploadedFiles = [];
+            const uploadedFiles: { name: string; buffer: ArrayBuffer }[] = [];
             const files: FileList = e.target.files;
-            setAllFiles(files);
             for (const file of files) {
                 if (file.name.toLowerCase().endsWith('.img')) {
                     uploadedFiles.push({
                         name: file.webkitRelativePath || file.name,
                         buffer: await file.arrayBuffer(),
                     });
-                } else {
-                    console.log('skipping ', file);
                 }
             }
             uploadedFiles.sort((a, b) => sortNames(a.name, b.name));
+
+            setAllFiles(files);
+            setMktFiles(await filterFiles(files));
             setFiles(uploadedFiles);
-            if (uploadedFiles.length > 0) {
-                setSelectedFile(uploadedFiles[0]);
-                selectionRef.current?.clearSelection();
-            }
+
+            // if (uploadedFiles.length > 0) {
+            //     setSelectedFile(uploadedFiles[0]);
+            //     selectionRef.current?.clearSelection();
+            // }
         },
         [],
     );
     const handleFileChosen: ChangeEventHandler<HTMLSelectElement> = useCallback(
         (e) => {
-            setSelectedFile(files.find((f) => f.name === e.target.value));
+            setSelectedFile(
+                files.find((f) => f.name === e.target.value) ||
+                    mktFiles?.imgData.find((f) => f.name === e.target.value),
+            );
             selectionRef.current?.clearSelection();
             clearCache();
         },
@@ -130,7 +140,16 @@ export function App() {
                                     onChange={handleFileChosen}
                                     value={selectedFile?.name}
                                 >
+                                    <option value="PLACEHOLDER">
+                                        Choose Your Destiny
+                                    </option>
                                     {files.map((f) => (
+                                        <option key={f.name} value={f.name}>
+                                            {f.name}
+                                        </option>
+                                    ))}
+
+                                    {mktFiles?.imgData.map((f) => (
                                         <option key={f.name} value={f.name}>
                                             {f.name}
                                         </option>
@@ -144,26 +163,36 @@ export function App() {
                             >
                                 THERE IS NO KNOWLEDGE THAT IS NOT POWER
                             </div>
-                            {allFiles.length > 0 && !files.length && (
-                                <>
-                                    <div className={styles.noFile}>
-                                        There is no supported file that has been
-                                        loaded.
-                                    </div>
+                            {(allFiles?.length || 0) > 0 &&
+                                !files.length &&
+                                !mktFiles?.imgData.length && (
+                                    <>
+                                        <div className={styles.noFile}>
+                                            There is no supported file that has
+                                            been loaded.
+                                        </div>
 
-                                    <div className={styles.noFile}>
-                                        {' '}
-                                        Only IMG files are supported.
-                                    </div>
+                                        <div className={styles.noFile}>
+                                            {' '}
+                                            Only IMG files are supported.
+                                        </div>
 
-                                    <div className={styles.noFile}>
-                                        You must consult the Elder Gods.
-                                    </div>
-                                </>
-                            )}
+                                        <div className={styles.noFile}>
+                                            You must consult the Elder Gods.
+                                        </div>
+                                    </>
+                                )}
                         </LayoutHeader>
 
-                        {imageLibrary && (
+                        {attFileIsSelected && (
+                            <LayoutMain>
+                                <MktImages
+                                    selectedFile={selectedFile}
+                                    mktFiles={mktFiles}
+                                />
+                            </LayoutMain>
+                        )}
+                        {!attFileIsSelected && imageLibrary && (
                             <LayoutMain>
                                 <div>Images</div>
                                 <div className={styles.itemsContainer}>
@@ -192,7 +221,7 @@ export function App() {
                                 {/*  <HexView buffer={imageLibrary.buffer} />*/}
                             </LayoutMain>
                         )}
-                        {imageLibrary && (
+                        {(imageLibrary || attFileIsSelected) && (
                             <LayoutSidebar>
                                 <Sidebar imageLibrary={imageLibrary} />
                             </LayoutSidebar>

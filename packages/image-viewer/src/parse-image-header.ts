@@ -344,6 +344,43 @@ export function paletteToRgbArray(
     return buffer;
 }
 
+/**
+ * This one is for MKT
+ */
+export function paletteBufferToRgbArray(
+    paletteData: DataView<ArrayBufferLike> | undefined,
+    numberOfColors: number,
+    alphaIndex?: number,
+): number[][] {
+    if (!paletteData) {
+        throw new Error('missing palette data!');
+    }
+    const colorsCount = numberOfColors;
+    const buffer: number[][] = [];
+    try {
+        for (let i = 0; i < colorsCount; i++) {
+            const indexColor = i;
+            const paletteColor = paletteData.getUint16(indexColor * 2, true);
+            const red = 8 * ((paletteColor >> 11) & 0b11111);
+            const green = 8 * ((paletteColor >> 6) & 0b11111);
+            const blue = 8 * ((paletteColor >> 1) & 0b11111);
+            buffer.push([red, green, blue]);
+        }
+        if (alphaIndex !== undefined) {
+            for (let i = 0; i < colorsCount; i++) {
+                if (i === alphaIndex) {
+                    buffer[i].push(0);
+                } else {
+                    buffer[i].push(255);
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('failed to get palette entry:', e);
+    }
+    return buffer;
+}
+
 export const animationEntryFormat = {
     itemPointer: fields.uint16,
     itemIndex: fields.uint8,

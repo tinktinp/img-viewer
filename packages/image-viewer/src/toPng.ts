@@ -3,7 +3,11 @@ import {
     type IndexedColors,
     type ImageData as PngImageData,
 } from 'fast-png';
-import { type Palettes, paletteToRgbArray } from './parse-image-header';
+import {
+    paletteBufferToRgbArray,
+    type Palettes,
+    paletteToRgbArray,
+} from './parse-image-header';
 import type { ImageLibrary } from './useImageLibrary';
 
 export function encodeAsPng(
@@ -35,6 +39,41 @@ export function encodeAsPng(
         depth: 8,
         channels: 1,
         palette: pngPalette,
+    };
+
+    const result = encode(pngImageData);
+
+    return result;
+}
+
+export function encodeBuffersAsPng(
+    data: Uint8Array,
+    palette: Uint8Array,
+    width: number,
+    height: number,
+) {
+    const pngPalette: IndexedColors = paletteBufferToRgbArray(
+        new DataView(palette.buffer, palette.byteOffset),
+        palette.byteLength / 2,
+        0,
+    );
+
+    const widthXheight = width * height;
+
+    if (data.byteLength < widthXheight) {
+        console.warn('width*height is %o but only got %o bytes! padding...', widthXheight, data.byteLength);
+        const data2 = new Uint8Array(widthXheight);
+        data2.set(data);
+        data = data2;
+    }
+
+    const pngImageData: PngImageData = {
+        width,
+        height,
+        data,
+        depth: 8,
+        channels: 1,
+        palette: pngPalette.reverse(),
     };
 
     const result = encode(pngImageData);

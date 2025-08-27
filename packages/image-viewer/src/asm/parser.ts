@@ -89,6 +89,7 @@ class State {
 const instructions = {
     '.align': processAlign,
     '.byte': processByte,
+    '.half': processHalf,
 } as const;
 
 function isKnownInstruction(
@@ -108,21 +109,51 @@ function processByte(_instruction: string, args: string, state: State) {
     const bytes = args.split(/,\s*|\s+/);
     for (const byte of bytes) {
         if (!byte.length) continue;
-        const byteAsNumber = Number.parseInt(byte);
-        if (byteAsNumber < 0) state.dataView.setInt8(state.pos, byteAsNumber);
-        else state.dataView.setUint8(state.pos, byteAsNumber);
-        state.pos++;
+        try {
+            const byteAsNumber = Number.parseInt(byte);
+            if (byteAsNumber < 0)
+                state.dataView.setInt8(state.pos, byteAsNumber);
+            else state.dataView.setUint8(state.pos, byteAsNumber);
+            state.pos++;
+        } catch (e) {
+            console.warn('failed to write byte!', { state });
+            throw e;
+        }
     }
     let padding = bytes.length % state.align;
     while (padding > 0) {
-        console.log('padding!');
+        // console.log('padding!');
+        state.dataView.setUint8(state.pos++, 0);
+        padding--;
+    }
+}
+
+function processHalf(_instruction: string, args: string, state: State) {
+    const bytes = args.split(/,\s*|\s+/);
+    for (const byte of bytes) {
+        if (!byte.length) continue;
+        try {
+            const byteAsNumber = Number.parseInt(byte);
+            if (byteAsNumber < 0)
+                state.dataView.setInt16(state.pos, byteAsNumber);
+            else state.dataView.setUint16(state.pos, byteAsNumber);
+            state.pos += 2;
+        } catch (e) {
+            console.warn('failed to write byte!', { state });
+            throw e;
+        }
+    }
+    const byteLen = bytes.length * 2;
+    let padding = byteLen % state.align;
+    while (padding > 0) {
+        // console.log('padding!');
         state.dataView.setUint8(state.pos++, 0);
         padding--;
     }
 }
 
 export function parseLiteralDataEntries(
-    lines: IteratorObject<string>,
+    lines: IteratorObject<string> | string[],
     metaData: AsmFileMetaData,
 ): LiteralDataEntry[] {
     const rv: LiteralDataEntry[] = [];
@@ -165,7 +196,7 @@ export function parseLiteralDataEntries(
         cur = {
             label,
             comment: runningComments.join('\n'),
-            data: new ArrayBuffer(1024, {
+            data: new ArrayBuffer(10 * 1024 * 1024, {
                 maxByteLength: 10 * 1024 * 1024,
             }),
         };
