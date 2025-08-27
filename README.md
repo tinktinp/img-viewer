@@ -2,6 +2,7 @@
 
 This is a web based viewer for `IMG` files. `IMG` files were used in Midway games in the late 80s and 90s.
 
+[ImgViewer](https://tinktinp.github.io/img-viewer/)
 
 ## What are `IMG` files?
 
