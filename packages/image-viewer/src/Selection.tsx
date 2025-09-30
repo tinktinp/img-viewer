@@ -1,5 +1,6 @@
 import {
     createContext,
+    type JSX,
     type Ref,
     useContext,
     useImperativeHandle,
@@ -8,11 +9,17 @@ import {
 } from 'react';
 import type { WithChildren } from './WithChildren';
 
+export interface FancySelectionObj {
+    SideBarComponent: () => JSX.Element;
+    onDownload: () => void;
+}
+
 export interface Selection {
     images: number[];
     palettes: number[];
     sequences: number[];
     scripts: number[];
+    fancySelectionObjs: FancySelectionObj[];
     addSelection: (toAdd: Partial<Selection>) => void;
     removeSelection: (toRemove: Partial<Selection>) => void;
     clearSelection: () => void;
@@ -23,6 +30,7 @@ const defaultSelection: Selection = {
     palettes: [],
     sequences: [],
     scripts: [],
+    fancySelectionObjs: [],
     addSelection() {
         throw new Error('Not implemented');
     },
@@ -59,6 +67,10 @@ export function SelectionProvider({
                         ...(toAdd.sequences || []),
                     ],
                     scripts: [...selection.scripts, ...(toAdd.scripts || [])],
+                    fancySelectionObjs: [
+                        ...selection.fancySelectionObjs,
+                        ...(toAdd.fancySelectionObjs || []),
+                    ],
                 });
             },
             removeSelection: (toRemove: Partial<Selection>) => {
@@ -75,6 +87,9 @@ export function SelectionProvider({
                     ),
                     scripts: selection.scripts.filter(
                         (v) => !toRemove.scripts?.includes(v),
+                    ),
+                    fancySelectionObjs: selection.fancySelectionObjs.filter(
+                        (v) => !toRemove.fancySelectionObjs?.includes(v),
                     ),
                 });
             },

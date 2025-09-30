@@ -14,6 +14,11 @@ import { ImageLibrarySidebar, Sidebar } from './Sidebar';
 import { useImageLibrary } from './useImageLibrary';
 import { filterFiles, type CategorizedFiles } from './asm/filterFiles';
 import { MktImages } from './MktImages';
+import {
+    filterMktPcFiles,
+    type MktPcFileNameAndData,
+} from './asm/mktPcImageFile';
+import { MktPcImages } from './MktPcImages';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
@@ -69,6 +74,8 @@ export function App() {
     const [allFiles, setAllFiles] = useState<FileList>();
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [mktFiles, setMktFiles] = useState<CategorizedFiles>();
+    const [mktPcFiles, setMktPcFiles] = useState<MktPcFileNameAndData[]>([]);
+
     const [selectedFile, setSelectedFile] = useState<
         UploadedFile | undefined
     >();
@@ -79,6 +86,9 @@ export function App() {
 
     const attFileIsSelected = Boolean(
         mktFiles && selectedFile?.name.toLowerCase().endsWith('att'),
+    );
+    const mktpcFileIsSelected = Boolean(
+        mktFiles && (selectedFile?.name.toLowerCase().endsWith('.dat') || selectedFile?.name.toLowerCase().endsWith('.bin')),
     );
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
@@ -98,6 +108,7 @@ export function App() {
 
             setAllFiles(files);
             setMktFiles(await filterFiles(files));
+            setMktPcFiles(await filterMktPcFiles(files));
             setFiles(uploadedFiles);
 
             // if (uploadedFiles.length > 0) {
@@ -111,7 +122,8 @@ export function App() {
         (e) => {
             setSelectedFile(
                 files.find((f) => f.name === e.target.value) ||
-                    mktFiles?.imgData.find((f) => f.name === e.target.value),
+                    mktFiles?.imgData.find((f) => f.name === e.target.value) ||
+                    mktPcFiles.find((f) => f.name === e.target.value),
             );
             selectionRef.current?.clearSelection();
             clearCache();
@@ -154,6 +166,12 @@ export function App() {
                                             {f.name}
                                         </option>
                                     ))}
+
+                                    {mktPcFiles.map((f) => (
+                                        <option key={f.name} value={f.name}>
+                                            {f.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div
@@ -165,7 +183,8 @@ export function App() {
                             </div>
                             {(allFiles?.length || 0) > 0 &&
                                 !files.length &&
-                                !mktFiles?.imgData.length && (
+                                !mktFiles?.imgData.length &&
+                                !mktPcFiles?.length && (
                                     <>
                                         <div className={styles.noFile}>
                                             There is no supported file that has
@@ -192,38 +211,58 @@ export function App() {
                                 />
                             </LayoutMain>
                         )}
-                        {!attFileIsSelected && imageLibrary && (
+
+                        {mktpcFileIsSelected && selectedFile && (
                             <LayoutMain>
-                                <div>Images</div>
-                                <div className={styles.itemsContainer}>
-                                    <ImageLibrary
-                                        imageLibrary={imageLibrary}
-                                    ></ImageLibrary>
-                                </div>
-                                <div>Palettes</div>
-                                <div className={styles.itemsContainer}>
-                                    <PaletteComponent
-                                        imageLibrary={imageLibrary}
-                                    />
-                                </div>
-                                <div>Sequences</div>
-                                <div className={styles.itemsContainer}>
-                                    <SequenceListLibrary
-                                        imageLibrary={imageLibrary}
-                                    />
-                                </div>
-                                <div>Scripts</div>
-                                <div className={styles.itemsContainer}>
-                                    <ScriptListLibrary
-                                        imageLibrary={imageLibrary}
-                                    />
-                                </div>
-                                {/*  <HexView buffer={imageLibrary.buffer} />*/}
+                                <MktPcImages selectedFile={selectedFile} />
                             </LayoutMain>
                         )}
-                        {(imageLibrary || attFileIsSelected) && (
+
+                        {!attFileIsSelected &&
+                            !mktpcFileIsSelected &&
+                            imageLibrary && (
+                                <LayoutMain>
+                                    <div>Images</div>
+                                    <div className={styles.itemsContainer}>
+                                        <ImageLibrary
+                                            imageLibrary={imageLibrary}
+                                        ></ImageLibrary>
+                                    </div>
+                                    <div>Palettes</div>
+                                    <div className={styles.itemsContainer}>
+                                        <PaletteComponent
+                                            imageLibrary={imageLibrary}
+                                        />
+                                    </div>
+                                    <div>Sequences</div>
+                                    <div className={styles.itemsContainer}>
+                                        <SequenceListLibrary
+                                            imageLibrary={imageLibrary}
+                                        />
+                                    </div>
+                                    <div>Scripts</div>
+                                    <div className={styles.itemsContainer}>
+                                        <ScriptListLibrary
+                                            imageLibrary={imageLibrary}
+                                        />
+                                    </div>
+                                    {/*  <HexView buffer={imageLibrary.buffer} />*/}
+                                </LayoutMain>
+                            )}
+                        {(imageLibrary ||
+                            attFileIsSelected ||
+                            mktpcFileIsSelected) && (
                             <LayoutSidebar>
-                                <Sidebar imageLibrary={imageLibrary} />
+                                <Sidebar
+                                    mode={
+                                        attFileIsSelected
+                                            ? 'mktn64'
+                                            : mktpcFileIsSelected
+                                              ? 'mktpc'
+                                              : 'img'
+                                    }
+                                    imageLibrary={imageLibrary}
+                                />
                             </LayoutSidebar>
                         )}
                     </Layout>

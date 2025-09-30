@@ -9,6 +9,7 @@ import {
 } from 'react';
 import type { WithChildren } from './WithChildren';
 import type { LiteralDataEntry } from './asm/parser';
+import type { MktN64Dict } from './asm/filterFiles';
 
 export type TransparencyStyle =
     | 'magenta'
@@ -27,6 +28,9 @@ export interface Settings {
         name: string;
         palettes: LiteralDataEntry[];
     }[];
+    mktPaletteFormat: string;
+    mktDicts: MktN64Dict[];
+    mktDictIndex: number;
     setSettings: (newSettings: Partial<Settings>) => void;
 }
 const defaultSettings: Settings = {
@@ -37,6 +41,9 @@ const defaultSettings: Settings = {
     ticksPerFrame: 5,
     mktPalette: [0, 0],
     mktPalettes: [],
+    mktPaletteFormat: 'RGBX5551',
+    mktDicts: [],
+    mktDictIndex: 0,
     setSettings: () => console.error('setSettings called without a provider!'),
 };
 
@@ -216,10 +223,77 @@ export function MktPalettePicker() {
                                 value={JSON.stringify([pfIdx, pIdx])}
                                 key={`${pfIdx}_${pIdx}`}
                             >
-                                {palette.label}
+                                {palette.label} ({palette.data.byteLength / 2})
                             </option>
                         ))}
                     </optgroup>
+                ))}
+            </select>
+        </label>
+    );
+}
+
+const paletteFormats = [
+    'RGBX5551',
+    'XRGB1555',
+    'RGB565',
+    'RGB655',
+    'RGB556',
+    'BGRX5551',
+    'XBGR1555',
+    'BGR565',
+    'BGR655',
+    'BGR556',
+];
+
+export function MktPaletteFormatPicker() {
+    const { mktPaletteFormat, setSettings } = useSettings();
+
+    const updateSettings: React.ChangeEventHandler<HTMLSelectElement> =
+        useCallback(
+            (e) => {
+                setSettings({
+                    mktPaletteFormat: e.target.value,
+                });
+            },
+            [setSettings],
+        );
+
+    return (
+        <label>
+            Palette Format{' '}
+            <select onChange={updateSettings} value={mktPaletteFormat}>
+                {paletteFormats.map((paletteFormat) => (
+                    <option value={paletteFormat} key={paletteFormat}>
+                        {paletteFormat}
+                    </option>
+                ))}
+            </select>
+        </label>
+    );
+}
+
+export function MktN64DictPicker() {
+    const { mktDicts, mktDictIndex, setSettings } = useSettings();
+
+    const updateSettings: React.ChangeEventHandler<HTMLSelectElement> =
+        useCallback(
+            (e) => {
+                setSettings({
+                    mktDictIndex: JSON.parse(e.target.value),
+                });
+            },
+            [setSettings],
+        );
+
+    return (
+        <label>
+            Dict{' '}
+            <select onChange={updateSettings} value={JSON.stringify(mktDictIndex)}>
+                {mktDicts.map((d, dIdx) => (
+                    <option value={JSON.stringify(dIdx)} key={`${dIdx}`}>
+                        {d.filename}
+                    </option>
                 ))}
             </select>
         </label>

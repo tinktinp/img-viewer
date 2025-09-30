@@ -5,7 +5,7 @@ const CURRENT_CACHES = {
 
 // export type CacheData = BodyInit;
 // BodyInit is too flexible, and keeps us from using it with `URL.createObjectUrl`
-export type CacheData = BlobPart;
+export type CacheData = BlobPart | Uint8Array;
 
 export interface CacheProps {
     data: CacheData;
@@ -32,7 +32,7 @@ export async function cacheAndBlobUrl({
     const name = new URL(url, import.meta.url).pathname;
     // could just use new Blob() here, but I like giving it the name, just in case
     // something decides to use it someday
-    const blob = new File([data], name, {
+    const blob = new File([data as BlobPart], name, {
         type: mimeType,
     });
     const blobUrl = URL.createObjectURL(blob);

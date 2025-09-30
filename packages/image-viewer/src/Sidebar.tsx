@@ -9,16 +9,21 @@ import type { ImageLibrary } from './useImageLibrary';
 
 export interface SidebarProps {
     imageLibrary?: ImageLibrary;
+    mode: 'img' | 'mktn64' | 'mktpc';
 }
-export function Sidebar({ imageLibrary }: SidebarProps) {
-    const mode = imageLibrary ? 'img' : 'mkt';
+export function Sidebar({ imageLibrary, mode }: SidebarProps) {
+    const { fancySelectionObjs } = useSelection();
     return (
         <>
-            {imageLibrary && <Download imageLibrary={imageLibrary} />}
+            {<Download imageLibrary={imageLibrary} />}
             <SettingsPanel mode={mode} />
             {imageLibrary && (
                 <ImageLibrarySidebar imageLibrary={imageLibrary} />
             )}
+            {fancySelectionObjs.map((f, idx) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: blah
+                <f.SideBarComponent key={idx} />
+            ))}
         </>
     );
 }
