@@ -218,6 +218,12 @@ export function App() {
                             <LayoutMain>
                                 <div className={styles.nothing}>
                                     You are nothing.
+                                    <div>
+                                        <small>
+                                            Your weak, pathetic file is zero
+                                            bytes.
+                                        </small>
+                                    </div>
                                 </div>
                             </LayoutMain>
                         )}
