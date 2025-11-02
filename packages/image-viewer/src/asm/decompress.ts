@@ -85,7 +85,7 @@ interface Indexable {
  * This class is designed to implement a similar pattern by bundling together a buffer and an offset into it,
  * and proving read and write methods that increment.
  */
-class BufferPtr<
+export class BufferPtr<
     T extends Indexable & {
         length: number;
         fill: (value: number, start?: number, end?: number) => T;
@@ -111,6 +111,10 @@ class BufferPtr<
     putAndInc(data: number) {
         this.buffer[this.offset++] = data;
     }
+    putAndInc16(data: number) {
+        this.buffer[this.offset++] = data & 0xFF;
+        this.buffer[this.offset++] = (data >>> 8) & 0xFF;
+    }
     fill(data: number, count: number) {
         for (let i = 0; i < count; i++) {
             this.putAndInc(data);
@@ -118,6 +122,46 @@ class BufferPtr<
     }
     atEnd() {
         return this.offset >= this.buffer.length;
+    }
+
+    get16Le() {
+        return this.buffer[this.offset] | (this.buffer[this.offset + 1] << 8);
+    }
+    get32Le() {
+        return (
+            this.buffer[this.offset] |
+            (this.buffer[this.offset + 1] << 8) |
+            (this.buffer[this.offset + 2] << 16) |
+            (this.buffer[this.offset + 3] << 24)
+        );
+    }
+    getAndInc16Le() {
+        const rv = this.get16Le();
+        this.offset += 2;
+        return rv;
+    }
+    getAndInc32Le() {
+        const rv = this.get32Le();
+        this.offset += 4;
+        return rv;
+    }
+
+    static toSigned(input: number, bits: number) {
+        const signBit = 1 << bits;
+        const mask = signBit - 1;
+        if (input >= signBit) {
+            input = -((~input & mask) + 1);
+        }
+        return input;
+    }
+    getAndIncS16Le() {
+        const rv = this.getAndInc16Le();
+        return BufferPtr.toSigned(rv, 15);
+    }
+
+    getAndIncS32Le() {
+        const rv = this.getAndInc32Le();
+        return BufferPtr.toSigned(rv, 31);
     }
 }
 
@@ -211,7 +255,7 @@ function decompress32WithDict(
             // |---|----|-------|
 
             let sw: number;
-            sw = byte >> 5; // `sw` is packed into bits 6 and 5 of `byte`, controls the 4 modes
+            sw = byte >>> 5; // `sw` is packed into bits 6 and 5 of `byte`, controls the 4 modes
             byte &= 0b1_1111; // byte is only 5 bits (bits 0 through 4), values 0-31, mask out `sw`'s bits
 
             switch (sw) {
@@ -227,7 +271,7 @@ function decompress32WithDict(
                         }
                     } else if (topFourMini !== undefined) {
                         let cnt = (byte & 0x07) + 3; //
-                        byte = topFourMini[(byte >> 3) & 0x03];
+                        byte = topFourMini[(byte >>> 3) & 0x03];
                         for (; cnt > 0; cnt--) {
                             outPtr.putAndInc(byte);
                         }
@@ -279,17 +323,17 @@ function decompress8(
         if (u8HighBitSet(byte)) {
             outPtr.fill(0, u8ClearHighBit(byte) + 1);
         } else if (byte & 0b100_0000) {
-            outPtr.putAndInc((byte >> 3) & 0b0111);
+            outPtr.putAndInc((byte >>> 3) & 0b0111);
             if (outPtr.offset < outBuffer.byteLength) {
                 outPtr.putAndInc(byte & 0b0111);
             }
         } else {
             let pixel = byte & 0b0111;
             if (pixel === 0) {
-                pixel = (byte >> 3) & 0b0111;
+                pixel = (byte >>> 3) & 0b0111;
                 outPtr.fill(pixel, inPtr.getAndInc());
             } else {
-                const count = ((byte >> 3) & 0b0111) + 3; // fixed paren
+                const count = ((byte >>> 3) & 0b0111) + 3; // fixed paren
                 outPtr.fill(pixel, count);
             }
         }
@@ -314,7 +358,7 @@ function decompress64(
 
     while (!inPtr.atEnd()) {
         let byte = inPtr.getAndInc();
-        const sw = byte >> 6;
+        const sw = byte >>> 6;
         byte &= 0b11_1111;
         switch (sw) {
             case 1:
@@ -362,7 +406,7 @@ function decompress16(
         if (u8HighBitSet(byte)) {
             outPtr.fill(0, u8ClearHighBit(byte) + 7);
         } else {
-            const sw = byte >> 4;
+            const sw = byte >>> 4;
             const pixel = byte & 0b0000_1111;
 
             if (sw === 0) {
@@ -371,7 +415,7 @@ function decompress16(
             } else if (sw === 7) {
                 for (let count = pixel + 3; count > 0; ) {
                     const pixel2 = inPtr.getAndInc();
-                    outPtr.putAndInc(pixel2 >> 4);
+                    outPtr.putAndInc(pixel2 >>> 4);
                     count--;
                     if (!count) break;
                     outPtr.putAndInc(pixel2 & 0b1111);
@@ -407,7 +451,7 @@ function decompress32WithDictType8(
             outPtr.putAndInc(dictPtr.getAndInc());
             outPtr.putAndInc(dictPtr.getAndInc());
         } else {
-            const sw = byte >> 5;
+            const sw = byte >>> 5;
             const pixel = byte & 0b0001_1111;
 
             if (sw === 3) {
@@ -467,7 +511,7 @@ function decompress32WithDictType14And19(
             outPtr.putAndInc(dictPtr.getAndInc());
             outPtr.putAndInc(dictPtr.get());
         } else {
-            const sw = byte >> 5;
+            const sw = byte >>> 5;
             byte &= 0b1_1111;
             if (sw === 3) {
                 outPtr.fill(byte, inPtr.getAndInc());
@@ -476,7 +520,7 @@ function decompress32WithDictType14And19(
                     outPtr.fill(miniPix, byte + 3);
                 } else if (topFourMini !== undefined) {
                     const count = (byte & 0b0111) + 3;
-                    byte = topFourMini[(byte >> 3) & 0b11];
+                    byte = topFourMini[(byte >>> 3) & 0b11];
                     outPtr.fill(byte, count);
                 }
             } else {
@@ -538,7 +582,7 @@ function decompressMethod13(
 
     while (inPtr.offset < buffer.byteLength) {
         let byte = inPtr.getAndInc();
-        const sw = byte >> 6; // high two bits
+        const sw = byte >>> 6; // high two bits
         byte = byte & 0b0011_1111; // low 6 bits
         if (sw === 3) {
             const count = inPtr.getAndInc();
@@ -582,7 +626,7 @@ function decompressMethod25(
 
     while (inPtr.offset < buffer.byteLength) {
         let byte = inPtr.getAndInc();
-        const sw = byte >> 6; // high two bits
+        const sw = byte >>> 6; // high two bits
         byte = byte & 0b0011_1111; // low 6 bits
         if (sw === 3) {
             const count = inPtr.getAndInc();

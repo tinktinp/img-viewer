@@ -1,19 +1,21 @@
 import { useCallback } from 'react';
-import { type Palettes, paletteToRgbArray } from './parse-image-header';
 import { useSelection } from './Selection';
 import { useSettings } from './Settings';
 import { encodeSequenceAsGif } from './toGif';
 import { encodeAsPng } from './toPng';
 import type { ImageLibrary } from './useImageLibrary';
+import { downloadFile, paletteToAct } from './downloadUtils';
 
 export interface DownloadProps {
-    imageLibrary: ImageLibrary;
+    imageLibrary?: ImageLibrary;
 }
 export function Download({ imageLibrary }: DownloadProps) {
     const selection = useSelection();
     const { fps, ticksPerFrame } = useSettings();
 
-    const handleClick = useCallback(() => {
+    const handleImageLibraryClick = useCallback(() => {
+        if (!imageLibrary) return;
+
         for (let i = 0; i < selection.images.length; i++) {
             const imageIndex = selection.images[i];
             const image = imageLibrary.images[imageIndex];
@@ -68,41 +70,20 @@ export function Download({ imageLibrary }: DownloadProps) {
         }
     }, [selection, imageLibrary, fps, ticksPerFrame]);
 
+    const handleSelectionClick = useCallback(() => {
+        selection.fancySelectionObjs.forEach((o) => {
+            o.onDownload();
+        });
+    }, [selection]);
+
+    const handleClick = useCallback(() => {
+        handleImageLibraryClick();
+        handleSelectionClick();
+    }, [handleImageLibraryClick, handleSelectionClick]);
+
     return (
         <button type="button" onClick={handleClick}>
             Download Selected
         </button>
     );
-}
-
-function paletteToAct(palette: Palettes) {
-    const data = paletteToRgbArray(palette.paletteHeader, palette.paletteData);
-    // const buffer = new Uint8Array(data.length * 3 + 2);
-    const buffer = new Uint8Array(256 * 3 + 4);
-    data.forEach(([r, g, b], i) => {
-        buffer[i * 3] = r;
-        buffer[i * 3 + 1] = g;
-        buffer[i * 3 + 2] = b;
-    });
-    buffer[256 * 3] = data.length & 0xff;
-    return buffer;
-}
-
-function downloadFile({
-    name,
-    type,
-    data,
-}: {
-    name: string;
-    type: string;
-    data: BlobPart;
-}) {
-    const blob = new Blob([data], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = name;
-    a.click();
-
-    URL.revokeObjectURL(url);
 }

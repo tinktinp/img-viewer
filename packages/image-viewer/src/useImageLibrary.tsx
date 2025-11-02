@@ -26,7 +26,7 @@ export function useImageLibrary(
     const [imageLibrary, setImageLibrary] = useState<ImageLibrary>();
 
     useEffect(() => {
-        if (!imgUrl) {
+        if (!imgUrl || !filename.toLowerCase().endsWith('.img')) {
             setImageLibrary(undefined);
             return;
         }

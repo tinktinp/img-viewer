@@ -1,6 +1,6 @@
 import { encodeBuffersAsPng } from '../toPng';
 import { decompress_image } from './decompress';
-import { parseLiteralDataEntries } from './parser';
+import { parseLiteralDataEntries, type LiteralDataEntry } from './parser';
 
 const fileTypes = [
     { ext: '.att', type: 'imgData' },
@@ -93,7 +93,11 @@ export function processPaletteFiles(paletteFiles: FileNameAndData[]) {
     return results;
 }
 
-export function processDictionary(dict?: FileNameAndData) {
+export interface MktN64Dict extends LiteralDataEntry {
+    filename: string;
+}
+
+export function processDictionary(dict?: FileNameAndData): MktN64Dict | undefined {
     if (dict === undefined) return undefined;
     const dictLines = dict.text.split('\n');
     dictLines.unshift('dict:');
@@ -102,7 +106,15 @@ export function processDictionary(dict?: FileNameAndData) {
         lineNo: 0,
     });
 
-    return dictionary;
+    return { ...dictionary, filename: dict.name };
+}
+
+export function maxImageIndex(data: Uint8Array<ArrayBufferLike>): number {
+    let max = 0;
+    for (let i = 0; i < data.byteLength; i++) {
+        max = Math.max(max, data[i]);
+    }
+    return max;
 }
 
 const debugDecompress = false;
@@ -111,6 +123,7 @@ export function imageToPng(
     meta: ImageMetaData | undefined,
     imageData: ArrayBuffer,
     paletteData: ArrayBuffer,
+    paletteFormat: string,
     dictData?: ArrayBuffer,
 ) {
     const { width = 150, height = 150 } = meta || {};
@@ -135,7 +148,8 @@ export function imageToPng(
 
     const png = encodeBuffersAsPng(
         decompressedImageData.slice(0, width * height),
-        new Uint8Array(paletteData).toReversed(), // TODO: move reverse into encodeBufferAsPng or find a way to remove it
+        new Uint8Array(paletteData),
+        paletteFormat,
         width,
         height,
     );

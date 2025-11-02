@@ -46,9 +46,40 @@ export function encodeAsPng(
     return result;
 }
 
+export function encodeBufferAndPaletteArrayAsPng(
+    data: Uint8Array,
+    palette: number[][],
+    width: number,
+    height: number,
+) {
+
+    const widthXheight = width * height;
+
+    if (data.byteLength < widthXheight) {
+        console.warn('width*height is %o but only got %o bytes! padding...', widthXheight, data.byteLength);
+        const data2 = new Uint8Array(widthXheight);
+        data2.set(data);
+        data = data2;
+    }
+
+    const pngImageData: PngImageData = {
+        width,
+        height,
+        data,
+        depth: 8,
+        channels: 1,
+        palette,
+    };
+
+    const result = encode(pngImageData);
+
+    return result;
+}
+
 export function encodeBuffersAsPng(
     data: Uint8Array,
     palette: Uint8Array,
+    paletteFormat: string,
     width: number,
     height: number,
 ) {
@@ -56,6 +87,7 @@ export function encodeBuffersAsPng(
         new DataView(palette.buffer, palette.byteOffset),
         palette.byteLength / 2,
         0,
+        paletteFormat,
     );
 
     const widthXheight = width * height;
@@ -73,7 +105,7 @@ export function encodeBuffersAsPng(
         data,
         depth: 8,
         channels: 1,
-        palette: pngPalette.toReversed(),
+        palette: pngPalette,
     };
 
     const result = encode(pngImageData);
