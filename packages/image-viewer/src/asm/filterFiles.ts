@@ -15,6 +15,7 @@ const fileTypes = [
 export interface FileNameAndData {
     name: string;
     text: string;
+    buffer?: ArrayBuffer; // never actually set, but simplifies some typing
 }
 
 export interface CategorizedFiles {

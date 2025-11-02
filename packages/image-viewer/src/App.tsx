@@ -12,7 +12,11 @@ import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
 import { ImageLibrarySidebar, Sidebar } from './Sidebar';
 import { useImageLibrary } from './useImageLibrary';
-import { filterFiles, type CategorizedFiles } from './asm/filterFiles';
+import {
+    filterFiles,
+    type CategorizedFiles,
+    type FileNameAndData,
+} from './asm/filterFiles';
 import { MktImages } from './MktImages';
 import {
     filterMktPcFiles,
@@ -35,6 +39,7 @@ declare global {
 interface UploadedFile {
     name: string;
     buffer: ArrayBuffer;
+    text?: string; // never present
 }
 
 const nameRegex = /(?<main>.+?)(?<number>[0-9]*)(?<suffix>[.].*)?$/;
@@ -77,7 +82,7 @@ export function App() {
     const [mktPcFiles, setMktPcFiles] = useState<MktPcFileNameAndData[]>([]);
 
     const [selectedFile, setSelectedFile] = useState<
-        UploadedFile | undefined
+        UploadedFile | FileNameAndData | undefined
     >();
     const imageLibrary = useImageLibrary(
         selectedFile?.buffer,
@@ -88,7 +93,9 @@ export function App() {
         mktFiles && selectedFile?.name.toLowerCase().endsWith('att'),
     );
     const mktpcFileIsSelected = Boolean(
-        mktFiles && (selectedFile?.name.toLowerCase().endsWith('.dat') || selectedFile?.name.toLowerCase().endsWith('.bin')),
+        mktFiles &&
+            (selectedFile?.name.toLowerCase().endsWith('.dat') ||
+                selectedFile?.name.toLowerCase().endsWith('.bin')),
     );
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
@@ -130,6 +137,10 @@ export function App() {
         },
         [files],
     );
+
+    const emptyFile =
+        selectedFile?.buffer?.byteLength === 0 ||
+        selectedFile?.text?.length === 0;
 
     return (
         <SettingsProvider>
@@ -203,7 +214,15 @@ export function App() {
                                 )}
                         </LayoutHeader>
 
-                        {attFileIsSelected && (
+                        {emptyFile && (
+                            <LayoutMain>
+                                <div className={styles.nothing}>
+                                    You are nothing.
+                                </div>
+                            </LayoutMain>
+                        )}
+
+                        {!emptyFile && attFileIsSelected && (
                             <LayoutMain>
                                 <MktImages
                                     selectedFile={selectedFile}
@@ -212,13 +231,14 @@ export function App() {
                             </LayoutMain>
                         )}
 
-                        {mktpcFileIsSelected && selectedFile && (
+                        {!emptyFile && mktpcFileIsSelected && selectedFile && (
                             <LayoutMain>
                                 <MktPcImages selectedFile={selectedFile} />
                             </LayoutMain>
                         )}
 
-                        {!attFileIsSelected &&
+                        {!emptyFile &&
+                            !attFileIsSelected &&
                             !mktpcFileIsSelected &&
                             imageLibrary && (
                                 <LayoutMain>
