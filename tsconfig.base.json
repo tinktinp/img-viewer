@@ -1,27 +1,28 @@
-  {
-  "compilerOptions": {
-    "lib": ["ESNext"],
-    "target": "es2024",
-    "emitDeclarationOnly": true,
-    "skipLibCheck": true,
-    "useDefineForClassFields": true,
-    "outDir": "${configDir}/dist",
+{
+    "compilerOptions": {
+        "lib": ["ESNext"],
+        "target": "es2024",
+        "emitDeclarationOnly": true,
+        "skipLibCheck": true,
+        "useDefineForClassFields": true,
+        "outDir": "${configDir}/dist",
 
-    /* modules */
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "verbatimModuleSyntax": true,
-    "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
+        /* modules */
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "verbatimModuleSyntax": true,
+        "resolveJsonModule": true,
+        "allowImportingTsExtensions": true,
 
-    /* stuff for project references / monorepo */
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
+        /* stuff for project references / monorepo */
+        "composite": true,
+        "declaration": true,
+        "declarationMap": true,
 
-    /* type checking */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true
-  },
+        /* type checking */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitAny": true
+    }
 }

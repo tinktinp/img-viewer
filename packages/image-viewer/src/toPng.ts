@@ -46,17 +46,38 @@ export function encodeAsPng(
     return result;
 }
 
+export function encodeRgba32AsPng(
+    data: Uint8Array,
+    width: number,
+    height: number,
+) {
+    const pngImageData: PngImageData = {
+        width,
+        height,
+        data,
+        depth: 8,
+        channels: 4,
+    };
+
+    const result = encode(pngImageData);
+
+    return result;
+}
+
 export function encodeBufferAndPaletteArrayAsPng(
     data: Uint8Array,
     palette: number[][],
     width: number,
     height: number,
 ) {
-
     const widthXheight = width * height;
 
     if (data.byteLength < widthXheight) {
-        console.warn('width*height is %o but only got %o bytes! padding...', widthXheight, data.byteLength);
+        console.warn(
+            'width*height is %o but only got %o bytes! padding...',
+            widthXheight,
+            data.byteLength,
+        );
         const data2 = new Uint8Array(widthXheight);
         data2.set(data);
         data = data2;
@@ -93,7 +114,11 @@ export function encodeBuffersAsPng(
     const widthXheight = width * height;
 
     if (data.byteLength < widthXheight) {
-        console.warn('width*height is %o but only got %o bytes! padding...', widthXheight, data.byteLength);
+        console.warn(
+            'width*height is %o but only got %o bytes! padding...',
+            widthXheight,
+            data.byteLength,
+        );
         const data2 = new Uint8Array(widthXheight);
         data2.set(data);
         data = data2;

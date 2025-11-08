@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/complexity/noUselessLoneBlockStatements: <explanation> */
-import { BufferPtr } from './decompress';
+import { BufferPtr } from './BufferPtr';
 import { HuffmanDecode } from './mktPcHuffman';
 import type { MktPcImage } from './mktPcImageFile';
 import { POVBQDecode } from './mktPcPovBq';

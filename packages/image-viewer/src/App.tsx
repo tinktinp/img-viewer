@@ -2,7 +2,7 @@ import { type ChangeEventHandler, useCallback, useRef, useState } from 'react';
 import styles from './App.module.css';
 import { clearCache } from './cacheFiles';
 import { ForkMe } from './ForkMe';
-import HexView from './HexView';
+// import HexView from './HexView';
 import { ImageLibrary } from './ImageLibrary';
 import { Layout, LayoutHeader, LayoutMain, LayoutSidebar } from './Layout';
 import { PaletteComponent } from './PaletteComponent';
@@ -10,7 +10,7 @@ import { ScriptListLibrary } from './ScriptList';
 import { type Selection, SelectionProvider } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
-import { ImageLibrarySidebar, Sidebar } from './Sidebar';
+import { Sidebar } from './Sidebar';
 import { useImageLibrary } from './useImageLibrary';
 import {
     filterFiles,
@@ -23,6 +23,7 @@ import {
     type MktPcFileNameAndData,
 } from './asm/mktPcImageFile';
 import { MktPcImages } from './MktPcImages';
+import { MklkImages } from './mklk/react/MklkImages';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
@@ -75,11 +76,19 @@ function sortNames(a: string, b: string) {
 }
 
 export function App() {
+    const [fileTypeData, setFileTypeData] = useState<unknown>(null);
+
+    const fileTypeComponentRef = useCallback((value: unknown) => {
+        if (value) {
+            setFileTypeData(() => value);
+        }
+    }, []);
     const selectionRef = useRef<Selection>(null);
     const [allFiles, setAllFiles] = useState<FileList>();
     const [files, setFiles] = useState<UploadedFile[]>([]);
     const [mktFiles, setMktFiles] = useState<CategorizedFiles>();
     const [mktPcFiles, setMktPcFiles] = useState<MktPcFileNameAndData[]>([]);
+    const [mklkFiles, setMklkFiles] = useState<UploadedFile[]>([]);
 
     const [selectedFile, setSelectedFile] = useState<
         UploadedFile | FileNameAndData | undefined
@@ -97,11 +106,15 @@ export function App() {
             (selectedFile?.name.toLowerCase().endsWith('.dat') ||
                 selectedFile?.name.toLowerCase().endsWith('.bin')),
     );
+    const mklkFileIsSelected = Boolean(
+        mklkFiles && selectedFile?.name.toLowerCase().endsWith('.sprite'),
+    );
     const handleFiles: ChangeEventHandler<HTMLInputElement> = useCallback(
         async (e) => {
             if (e.target.files === null) return;
 
             const uploadedFiles: { name: string; buffer: ArrayBuffer }[] = [];
+            const mklkFiles = [];
             const files: FileList = e.target.files;
             for (const file of files) {
                 if (file.name.toLowerCase().endsWith('.img')) {
@@ -109,13 +122,20 @@ export function App() {
                         name: file.webkitRelativePath || file.name,
                         buffer: await file.arrayBuffer(),
                     });
+                } else if (file.name.toLowerCase().endsWith('.sprite')) {
+                    mklkFiles.push({
+                        name: file.webkitRelativePath || file.name,
+                        buffer: await file.arrayBuffer(),
+                    });
                 }
             }
             uploadedFiles.sort((a, b) => sortNames(a.name, b.name));
+            mklkFiles.sort((a, b) => sortNames(a.name, b.name));
 
             setAllFiles(files);
             setMktFiles(await filterFiles(files));
             setMktPcFiles(await filterMktPcFiles(files));
+            setMklkFiles(mklkFiles);
             setFiles(uploadedFiles);
 
             // if (uploadedFiles.length > 0) {
@@ -125,12 +145,14 @@ export function App() {
         },
         [],
     );
+    // biome-ignore lint/correctness/useExhaustiveDependencies: `files` always changes if the other variables change
     const handleFileChosen: ChangeEventHandler<HTMLSelectElement> = useCallback(
         (e) => {
             setSelectedFile(
                 files.find((f) => f.name === e.target.value) ||
                     mktFiles?.imgData.find((f) => f.name === e.target.value) ||
-                    mktPcFiles.find((f) => f.name === e.target.value),
+                    mktPcFiles.find((f) => f.name === e.target.value) ||
+                    mklkFiles.find((f) => f.name === e.target.value),
             );
             selectionRef.current?.clearSelection();
             clearCache();
@@ -183,6 +205,12 @@ export function App() {
                                             {f.name}
                                         </option>
                                     ))}
+
+                                    {mklkFiles.map((f) => (
+                                        <option key={f.name} value={f.name}>
+                                            {f.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div
@@ -195,7 +223,8 @@ export function App() {
                             {(allFiles?.length || 0) > 0 &&
                                 !files.length &&
                                 !mktFiles?.imgData.length &&
-                                !mktPcFiles?.length && (
+                                !mktPcFiles?.length &&
+                                !mklkFiles?.length && (
                                     <>
                                         <div className={styles.noFile}>
                                             There is no supported file that has
@@ -204,7 +233,9 @@ export function App() {
 
                                         <div className={styles.noFile}>
                                             {' '}
-                                            Only IMG files are supported.
+                                            Only IMG files are supported. And
+                                            .att files. And also .dat files and
+                                            .sprite files.
                                         </div>
 
                                         <div className={styles.noFile}>
@@ -231,15 +262,24 @@ export function App() {
                         {!emptyFile && attFileIsSelected && (
                             <LayoutMain>
                                 <MktImages
-                                    selectedFile={selectedFile}
-                                    mktFiles={mktFiles}
+                                    selectedFile={selectedFile as FileNameAndData}
+                                    mktFiles={mktFiles as CategorizedFiles}
                                 />
                             </LayoutMain>
                         )}
 
                         {!emptyFile && mktpcFileIsSelected && selectedFile && (
                             <LayoutMain>
-                                <MktPcImages selectedFile={selectedFile} />
+                                <MktPcImages selectedFile={selectedFile as MktPcFileNameAndData} />
+                            </LayoutMain>
+                        )}
+
+                        {!emptyFile && mklkFileIsSelected && selectedFile && (
+                            <LayoutMain>
+                                <MklkImages
+                                    selectedFile={selectedFile as UploadedFile}
+                                    ref={fileTypeComponentRef}
+                                />
                             </LayoutMain>
                         )}
 
@@ -277,7 +317,8 @@ export function App() {
                             )}
                         {(imageLibrary ||
                             attFileIsSelected ||
-                            mktpcFileIsSelected) && (
+                            mktpcFileIsSelected ||
+                            mklkFileIsSelected) && (
                             <LayoutSidebar>
                                 <Sidebar
                                     mode={
@@ -285,9 +326,12 @@ export function App() {
                                             ? 'mktn64'
                                             : mktpcFileIsSelected
                                               ? 'mktpc'
-                                              : 'img'
+                                              : mklkFileIsSelected
+                                                ? 'mklk'
+                                                : 'img'
                                     }
                                     imageLibrary={imageLibrary}
+                                    modeData={fileTypeData}
                                 />
                             </LayoutSidebar>
                         )}
