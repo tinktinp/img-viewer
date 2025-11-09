@@ -38,6 +38,9 @@ importers:
 
   packages/image-viewer:
     dependencies:
+      '@nick/lz4':
+        specifier: jsr:^0.3.4
+        version: '@jsr/nick__lz4@0.3.4'
       '@types/react-dom':
         specifier: ^19.1.6
         version: 19.1.6(@types/react@19.1.8)
@@ -143,6 +146,9 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.4':
     resolution: {integrity: sha512-VT2+G1VQs/9oz078bLrYbecdZKs912zQlkelYpuf+SXF+QvZDYJlbx/LSx+meSAwdDFnF8FVXW92AVjjkVmgFw==}
+
+  '@jsr/nick__lz4@0.3.4':
+    resolution: {integrity: sha512-ZNc+8lCMC8D/cIa9GrSxRcEQC/MyThBOXXlg6rhrvAWSUcKPODwvscsVA+v1UugiBzfJ2dvQIZ/j8484PMadkg==, tarball: https://npm.jsr.io/~/11/@jsr/nick__lz4/0.3.4.tgz}
 
   '@module-federation/error-codes@0.16.0':
     resolution: {integrity: sha512-TfmA45b8vvISniGudMg8jjIy1q3tLPon0QN/JdFp5f8AJ8/peICN5b+dkEQnWsAVg2fEusYhk9dO7z3nUeJM8A==}
@@ -473,6 +479,8 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.4': {}
+
+  '@jsr/nick__lz4@0.3.4': {}
 
   '@module-federation/error-codes@0.16.0': {}
 

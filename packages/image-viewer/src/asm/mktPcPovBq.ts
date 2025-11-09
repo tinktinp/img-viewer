@@ -1,5 +1,5 @@
 import { BitBuffer } from './BitBuffer';
-import { BufferPtr } from './decompress';
+import { BufferPtr } from './BufferPtr';
 
 // this doesn't make typescript treat these any different, but it serves as a reminder for the reader
 type uint = number;

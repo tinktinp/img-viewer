@@ -1,4 +1,4 @@
-import type { BufferPtr } from './decompress';
+import type { BufferPtr } from './BufferPtr';
 import {
     type ReadMethod,
     type UnitSize,

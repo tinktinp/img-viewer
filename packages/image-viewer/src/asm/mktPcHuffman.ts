@@ -1,5 +1,5 @@
 import { BitBuffer } from './BitBuffer';
-import { BufferPtr } from './decompress';
+import { BufferPtr } from './BufferPtr';
 
 export function HuffmanDecode(
     tablesBuffer: Uint8Array,

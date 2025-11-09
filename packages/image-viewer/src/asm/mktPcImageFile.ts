@@ -1,4 +1,4 @@
-import { BufferPtr } from './decompress';
+import { BufferPtr } from './BufferPtr';
 import {
     getCompressionType,
     uncompressImage,

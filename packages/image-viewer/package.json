@@ -19,6 +19,7 @@
         "typescript": "catalog:"
     },
     "dependencies": {
+        "@nick/lz4": "jsr:^0.3.4",
         "@types/react-dom": "^19.1.6",
         "fast-png": "^7.0.0",
         "react": "^19.1.0",

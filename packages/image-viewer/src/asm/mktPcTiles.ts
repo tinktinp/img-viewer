@@ -1,4 +1,4 @@
-import { BufferPtr } from './decompress';
+import { BufferPtr } from './BufferPtr';
 import type { MktPcImage } from './mktPcImageFile';
 
 export function TilesDecode(

@@ -9,7 +9,7 @@ import {
 } from './Settings';
 import styles from './SettingsPanel.module.css';
 
-export function SettingsPanel({ mode }: { mode: 'img' | 'mktn64' | 'mktpc' }) {
+export function SettingsPanel({ mode }: { mode: 'img' | 'mktn64' | 'mktpc' | 'mklk' }) {
     return (
         <div className={styles.settingsPanel}>
             <div className={styles.heading}>Settings</div>
