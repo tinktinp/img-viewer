@@ -55,7 +55,7 @@ export function useMklkHandleSelection(images: MklkImage[], sprites: SpriteHeade
                                 );
 
                                 downloadFile({
-                                    name: `${index}_${name}.png`,
+                                    name: `${type}_${index}.png`,
                                     type: 'image/png',
                                     data,
                                 });
