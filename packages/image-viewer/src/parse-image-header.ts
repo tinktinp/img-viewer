@@ -1,3 +1,4 @@
+import { mktN64PaletteEntryToRGB } from './palettes/palettes';
 import {
     ByteStringField,
     fields,
@@ -311,7 +312,7 @@ export function paletteToImageData(
 }
 
 export function paletteToRgbArray(
-    paletteHeader: {numberOfColors: number},
+    paletteHeader: { numberOfColors: number },
     paletteData: DataView<ArrayBufferLike> | undefined,
     alphaIndex?: number,
 ): number[][] {
@@ -342,82 +343,6 @@ export function paletteToRgbArray(
         console.warn('failed to get palette entry:', e);
     }
     return buffer;
-}
-
-// trying to understand what is different between the .rgb and .pal files
-// looks like pal right shifted compared to rgb, and always has the highest bit zero
-// also I'm reading it in as a big endian 16 bit word in both cases
-
-// RGB 0xFF39 = 0b   11111 11100 111001
-// PAL 0x7F9C = 0b 0 11111 11100 11100
-
-// RGB 0xFCA5 = 0b   11111 10010 10010 1
-// PAL 0x7E52 = 0b 0 11111 10010 10010
-
-// for some of these, they are not the same even with the shifting:
-// rgb 0x5801 = 0b   10110 00000 0000 1
-// pal 0x2C21 = 0b 0 10110 00010 0001
-
-export function mktN64PaletteEntryToRGB(
-    paletteData: DataView<ArrayBufferLike>,
-    indexColor: number,
-    paletteFormat: string,
-) {
-    const paletteColor = paletteData.getUint16(indexColor * 2, false);
-
-    if (paletteFormat === 'RGBX5551') {
-        const red = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 6) & 0b1_1111);
-        const blue = 8 * ((paletteColor >> 1) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'XRGB1555') {
-        const red = 8 * ((paletteColor >> 10) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 5) & 0b1_1111);
-        const blue = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'RGB565') {
-        const red = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 4 * ((paletteColor >> 5) & 0b11_1111);
-        const blue = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'RGB655') {
-        const red = 4 * ((paletteColor >> 10) & 0b11_1111);
-        const green = 8 * ((paletteColor >> 5) & 0b1_1111);
-        const blue = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'RGB556') {
-        const red = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 6) & 0b1_1111);
-        const blue = 4 * ((paletteColor >> 0) & 0b11_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'BGRX5551') {
-        const blue = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 6) & 0b1_1111);
-        const red = 8 * ((paletteColor >> 1) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'XBGR1555') {
-        const blue = 8 * ((paletteColor >> 10) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 5) & 0b1_1111);
-        const red = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'BGR565') {
-        const blue = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 4 * ((paletteColor >> 5) & 0b11_1111);
-        const red = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'BGR655') {
-        const blue = 4 * ((paletteColor >> 10) & 0b11_1111);
-        const green = 8 * ((paletteColor >> 5) & 0b1_1111);
-        const red = 8 * ((paletteColor >> 0) & 0b1_1111);
-        return [red, green, blue];
-    } else if (paletteFormat === 'BGR556') {
-        const blue = 8 * ((paletteColor >> 11) & 0b1_1111);
-        const green = 8 * ((paletteColor >> 6) & 0b1_1111);
-        const red = 4 * ((paletteColor >> 0) & 0b11_1111);
-        return [red, green, blue];
-    } else {
-        throw new Error(`Unknown palette format ${paletteFormat}!`);
-    }
 }
 
 /**

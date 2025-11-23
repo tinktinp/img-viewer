@@ -1,4 +1,5 @@
 import * as lz4 from '@nick/lz4';
+// import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
 import { BufferPtr } from '../../asm/BufferPtr';
 import type {
@@ -8,6 +9,8 @@ import type {
     SpriteSectionHeader,
     UploadedFile,
 } from '../MklkTypes';
+
+// const ddsLoader = new DDSLoader();
 
 export function processMklkSpriteFile(selectedFile: UploadedFile): {
     fileHeader: MklkFileHeader;
@@ -107,6 +110,7 @@ export function processBlock(ptr: BufferPtr<Uint8Array>): MklkImage {
     const dataHeader = ptr.getAndIncStaticStr(4);
     const dataSize = ptr.getAndInc32Le();
 
+
     const rawData = new Uint8Array(ptr.getAndIncAsBuffer(dataSize));
 
     const ret: MklkImage = {
@@ -142,6 +146,9 @@ export function processBlock(ptr: BufferPtr<Uint8Array>): MklkImage {
         } catch (e) {
             console.warn('failed to decompress lz4 image', ret, e);
         }
+    // } else if (dataType === 'ddsl') {
+    //    const map = ddsLoader.parse(ret.rawData.buffer.slice(2) as ArrayBuffer, true);
+    //    console.log('ddsl', map);
     } else {
         console.log('unsupported dataType', dataType);
     }
@@ -217,7 +224,10 @@ function processSpriteDataSection(
     };
 }
 
-function processSpriteHeader(ptr: BufferPtr<Uint8Array>, index: number): SpriteHeader {
+function processSpriteHeader(
+    ptr: BufferPtr<Uint8Array>,
+    index: number,
+): SpriteHeader {
     return {
         index,
         xpos: ptr.getAndInc32Le(),
@@ -251,7 +261,7 @@ function extractOneSprite(
     const inBuf = sheet.data;
     const outBuf = new Uint8Array(spriteSizeInBytes);
     const startOffsetInPixels =
-        (sheet.width * spriteHeader.ypos + spriteHeader.xpos);
+        sheet.width * spriteHeader.ypos + spriteHeader.xpos;
 
     for (let row = 0; row < spriteHeader.height; row++) {
         const inOffset = (startOffsetInPixels + row * sheet.width) * 4;

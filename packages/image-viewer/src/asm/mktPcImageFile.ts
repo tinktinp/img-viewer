@@ -1,3 +1,4 @@
+import { processOnePalette } from '../palettes/palettes';
 import { BufferPtr } from './BufferPtr';
 import {
     getCompressionType,
@@ -350,31 +351,4 @@ function processPalettes(buffer: Uint8Array) {
     }
 
     return palettes;
-}
-function processOnePalette(
-    ptr: BufferPtr<Uint8Array<ArrayBufferLike>>,
-    id = '',
-) {
-    const rgb: number[][] = [];
-    const paletteSize = ptr.getAndInc16Le();
-    if (paletteSize === 0) {
-        return { id, paletteSize, rgb };
-    }
-
-    for (let counter = paletteSize; counter > 0; counter--) {
-        const color = ptr.getAndInc16Le();
-
-        // const g = (color & 0x3e0) >> 5;
-        // const b = color & 0x1f;
-        // const r = (color & 0x7c00) >> 10;
-        // rgb.push([8 * r, 8 * g, 8 * b, 255]);
-        rgb.push([
-            8 * ((color >> 0) & 31),
-            8 * ((color >> 5) & 31),
-            8 * ((color >> 10) & 31),
-            255,
-        ]);
-    }
-    rgb[0][3] = 0; // index zero is transparent
-    return { id, paletteSize, rgb };
 }
