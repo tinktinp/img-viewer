@@ -86,6 +86,18 @@ $ pnpm install
 $ pnpm run dev
 ```
 
+## CLI
+
+There's a simple command line interface.
+
+```sh
+node --import jiti/register packages/image-viewer/cli/cli.ts dump-rom  --outdir=/path/to/some/folder --maincpu /path/to/mk2.maincpu --gfxrom /path/to/mk2.gfxrom
+```
+
+```sh
+node --import jiti/register packages/image-viewer/cli/cli.ts dump-rom  --mk1 --outdir=/path/to/some/folder --maincpu /path/to/mkr4.maincpu --gfxrom /path/to/gfxrom
+```
+
 ## TODO
 
 A rough list of future enhancements.
