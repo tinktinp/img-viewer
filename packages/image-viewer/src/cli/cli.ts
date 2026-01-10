@@ -3,6 +3,7 @@
 import { Console } from 'node:console';
 import minimist from 'minimist';
 import { dumpRomNode } from '../arcade-roms/roms';
+import { dumpMk1Pc } from '../mk1-pc/mk1-pc';
 
 const logger = new Console(process.stdout);
 
@@ -16,6 +17,10 @@ async function main() {
         process.exit(0);
     } else if (cmd[0] === 'dump-rom') {
         process.exit(await dumpRomCli(argv));
+    } else if (cmd[0] === 'dump-mk1-pc') {
+        process.exit(
+            await dumpMk1Pc({ outdir: argv.outdir, indir: argv.indir }),
+        );
     } else {
         logger.log('Unknown subcommand! Try "help" for help!');
         process.exit(1);

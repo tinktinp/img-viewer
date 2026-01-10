@@ -9,10 +9,19 @@ export interface AsmFileMetaData {
     lineNo: number;
 }
 
+export interface AsmLine {
+    label?: string;
+    instruction?: string;
+    args?: string;
+    comment?: string;
+}
+
+const debugAsmParse = false;
+
 export function parseAsmLine(
     line: string,
     { filename, lineNo }: AsmFileMetaData,
-) {
+): AsmLine & { line?: string } {
     if (line.match(asmWholeLineComment)) {
         return { comment: line, line };
     }
@@ -23,7 +32,7 @@ export function parseAsmLine(
     const match = asmLineMatcher.exec(line);
     if (!match || !match.groups) {
         const trimmed = line.replace('\u001a', '').trim();
-        if (trimmed.length > 0) {
+        if (debugAsmParse && trimmed.length > 0) {
             console.log(
                 filename,
                 ': failed to parse line! ',
@@ -56,22 +65,28 @@ export interface SymbolicDataEntry {
     data: number | AsmSymbol[];
 }
 
+export interface AsmLinex {
+    label?: string;
+}
 export interface LiteralDataEntry {
     kind: 'literal';
     comment: string;
     label: string;
     data: ArrayBuffer;
+    asmLines: AsmLine[];
 }
 export function makeLiteralDataEntry({
     label = '',
     data = new ArrayBuffer(),
     comment = '',
+    asmLines = [],
 }: Omit<Partial<LiteralDataEntry>, 'kind'> = {}): LiteralDataEntry {
     return {
         kind: 'literal',
         label,
         data,
         comment,
+        asmLines,
     };
 }
 
@@ -163,13 +178,16 @@ export function parseLiteralDataEntries(
     const state: State = new State(new DataView(new ArrayBuffer()));
 
     lines.forEach((line) => {
-        const { label, instruction, args, comment } = parseAsmLine(
-            line,
-            metaData,
-        );
+        const {
+            label,
+            instruction,
+            args = '',
+            comment = '',
+        } = parseAsmLine(line, metaData);
         if (label) {
             appendDataEntry(label, comment);
         }
+        cur.asmLines.push({ label, instruction, args, comment });
 
         if (comment && !instruction) {
             runningComments.push(comment);
@@ -182,7 +200,7 @@ export function parseLiteralDataEntries(
         }
     });
 
-    // since our queue to append an entry is the next label,
+    // since our cue to append an entry is the next label,
     // we need a special case to append the very last created entry
     if ((cur.label && rv.length === 0) || !Object.is(cur, rv[rv.length - 1])) {
         appendDataEntryOnly();
@@ -199,6 +217,7 @@ export function parseLiteralDataEntries(
             data: new ArrayBuffer(10 * 1024 * 1024, {
                 maxByteLength: 10 * 1024 * 1024,
             }),
+            asmLines: [],
         };
         state.dataView = new DataView(cur.data);
         state.pos = 0;

@@ -10,7 +10,8 @@
         "dev": "rsbuild dev --open",
         "format": "biome format --write",
         "preview": "rsbuild preview",
-        "test": "rstest"
+        "test": "rstest",
+        "cli": "node --import jiti/register ./src/cli/cli.ts"
     },
     "devDependencies": {
         "@biomejs/biome": "catalog:",
@@ -25,7 +26,10 @@
     },
     "dependencies": {
         "@nick/lz4": "jsr:^0.3.4",
+        "@tanstack/react-store": "^0.8.0",
+        "@tanstack/react-virtual": "^3.13.13",
         "@types/react-dom": "^19.1.6",
+        "downshift": "^9.0.13",
         "fast-png": "^7.0.0",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",

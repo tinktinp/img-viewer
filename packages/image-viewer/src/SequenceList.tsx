@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Checkerboard } from './Checkerboard';
+import { Checkerboard } from './common-react/Checkerboard';
 import GifSequence from './GifSequence';
 import styles from './ImageLibrary.module.css';
-import { useSelection } from './Selection';
+import { addSelection, removeSelection } from './Selection';
 import Sequence from './Sequence';
 import { useSettings } from './Settings';
 import type { ImageLibrary } from './useImageLibrary';
@@ -14,20 +14,15 @@ export interface ImageLibraryProps {
 
 export function SequenceListLibrary({ imageLibrary }: ImageLibraryProps) {
     const { zoom, animation } = useSettings();
-    const { addSelection, removeSelection } = useSelection();
-
     const handleChecked: React.MouseEventHandler<HTMLInputElement> =
-        useCallback(
-            (e) => {
-                const sequenceIndex = Number.parseInt(e.currentTarget.value);
-                if (e.currentTarget.checked) {
-                    addSelection({ sequences: [sequenceIndex] });
-                } else {
-                    removeSelection({ sequences: [sequenceIndex] });
-                }
-            },
-            [addSelection, removeSelection],
-        );
+        useCallback((e) => {
+            const sequenceIndex = Number.parseInt(e.currentTarget.value);
+            if (e.currentTarget.checked) {
+                addSelection({ sequences: [sequenceIndex] });
+            } else {
+                removeSelection({ sequences: [sequenceIndex] });
+            }
+        }, []);
 
     return imageLibrary.sequences.map((sequence, i) => {
         return (

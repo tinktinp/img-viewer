@@ -16,6 +16,8 @@ import type { ImageMetaData } from './filterFiles';
  */
 const typeToFunction = {
     0: alreadyDecompressed,
+    21: alreadyDecompressed, // just guessing
+    2: type2SimpleRLE,
     7: decompress64,
     8: decompress32WithDictType8,
     // 9 and 18 use inflate
@@ -30,6 +32,26 @@ const typeToFunction = {
     24: decompress32WithDict,
     25: decompressMethod25,
 } as const;
+
+const typeToTypeName = {
+    0: 'raw #0',
+    21: 'raw #21', // just guessing
+    2: 'simple RLE',
+    7: '64 color RLE with dict #7',
+    8: '32 color RLE with dict #8',
+    9: 'pkzip #9',
+    13: 'method #13',
+    14: '32 color RLE with dict #14',
+    15: '8 color #15',
+    16: '16 color #16',
+    18: 'pkzip #18',
+    19: '32 color RLE with dict #19',
+    20: 'method #20',
+    22: '32 color with dict #22',
+    23: '32 color with dict #23',
+    24: '32 color with dict #24',
+    25: 'method #25',
+};
 
 const typeNeedsDict = {
     7: true,
@@ -48,7 +70,31 @@ function getImageType(buffer: Uint8Array) {
     return buffer[0] & 0b11_1111; // type is only 6 bits
 }
 
-export function decompress_image(
+function getImageSize(buffer: Uint8Array) {
+    const view = new DataView(buffer.buffer, buffer.byteOffset);
+    const size = view.getUint32(0, false) & 0x00ffffff; // size is 24 bits
+    return size;
+}
+
+export function mktN64GetImageInfo(buffer: Uint8Array) {
+    const type = getImageType(buffer);
+    const knownType = isKnownType(type);
+    const size = getImageSize(buffer);
+    const needsDict = type in typeNeedsDict;
+    const typeName = (typeToTypeName as Record<number, string | undefined>)[
+        type
+    ];
+
+    return {
+        type,
+        typeName,
+        knownType,
+        needsDict,
+        size,
+    };
+}
+
+export function mktN64DecompressImage(
     buffer: Uint8Array,
     dictionary: Uint8Array | undefined,
     meta: ImageMetaData,
@@ -83,6 +129,31 @@ function alreadyDecompressed(
     _meta: ImageMetaData,
 ) {
     return buffer.slice(0);
+}
+
+function type2SimpleRLE(
+    buffer: Uint8Array,
+    _dictionary: Uint8Array,
+    meta: ImageMetaData,
+): Uint8Array {
+    // const view = new DataView(buffer.buffer, buffer.byteOffset);
+    // const _inSize = view.getUint32(0, false) & 0x00ffffff; // size is 24 bits
+    const outBuffer = new Uint8Array(new ArrayBuffer(meta.width * meta.height));
+    const outPtr = new BufferPtr(outBuffer);
+    const inPtr = new BufferPtr(buffer, 4);
+
+    while (!inPtr.atEnd()) {
+        const byte = inPtr.getAndIncS8Le();
+        if (byte < 0) {
+            const ch = inPtr.getAndInc(); // get the fill byte
+            outPtr.fill(ch, Math.abs(byte) + 1);
+        } else {
+            for (let i = byte; i >= 0; i--) {
+                outPtr.putAndInc(inPtr.getAndInc());
+            }
+        }
+    }
+    return outBuffer;
 }
 
 /**
@@ -281,12 +352,11 @@ function decompress64(
                 break;
             case 2:
                 {
-                    const dictPtr = new BufferPtr(
-                        dictionary,
-                        (byte & 0b11_1111) << 1,
-                    );
-                    outPtr.putAndInc(dictPtr.getAndInc());
-                    outPtr.putAndInc(dictPtr.get());
+                    const dictOffset = (byte & 0b11_1111) << 1;
+                    //const dictPtr = new BufferPtr(dictionary, dictOffset)
+
+                    outPtr.putAndInc(dictionary[dictOffset]);
+                    outPtr.putAndInc(dictionary[dictOffset + 1]);
                 }
                 break;
             case 3:

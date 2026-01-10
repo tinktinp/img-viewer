@@ -3,27 +3,23 @@ import CachedPngImg from './CachedPngImg';
 import type { ImageLibraryProps } from './ImageLibrary';
 import styles from './ImageLibrary.module.css';
 import type { Palettes } from './parse-image-header';
-import { useSelection } from './Selection';
+import { addSelection, removeSelection } from './Selection';
 import { useSettings } from './Settings';
 import { encodePaletteAsPng } from './toPng';
 
 export function PaletteComponent({ imageLibrary }: ImageLibraryProps) {
     const { zoom } = useSettings();
-    const { addSelection, removeSelection } = useSelection();
 
     const handleChecked: React.ChangeEventHandler<
         HTMLInputElement & { value: string; checked: boolean }
-    > = useCallback(
-        (e) => {
-            const paletteIndex = Number.parseInt(e.currentTarget.value);
-            if (e.currentTarget.checked) {
-                addSelection({ palettes: [paletteIndex] });
-            } else {
-                removeSelection({ palettes: [paletteIndex] });
-            }
-        },
-        [addSelection, removeSelection],
-    );
+    > = useCallback((e) => {
+        const paletteIndex = Number.parseInt(e.currentTarget.value);
+        if (e.currentTarget.checked) {
+            addSelection({ palettes: [paletteIndex] });
+        } else {
+            removeSelection({ palettes: [paletteIndex] });
+        }
+    }, []);
 
     return imageLibrary.palettes.map((palette, i) => {
         const paddedIndex = i.toString().padStart(3, '0');

@@ -2,7 +2,13 @@
 
 This is a web based viewer for `IMG` files. `IMG` files were used in Midway games in the late 80s and 90s.
 
-[ImgViewer](https://tinktinp.github.io/img-viewer/)
+Live version: [ImgViewer](https://tinktinp.github.io/img-viewer/)
+
+It now also supports files from Mortal Kombat Trilogy (N64 and PSX/PC), and sprite files found in MKLK.
+
+Also check out my other repos:
+- [hexpat](https://github.com/tinktinp/hexpat) files for loading the sprites in the ImHex hex editor
+- [watcom-debug-symbols](https://github.com/tinktinp/watcom-debug-symbols) for extracting the symbols from PC MKT and other files with Watcom debugging symbols
 
 ## What are `IMG` files?
 
@@ -21,6 +27,7 @@ This is a web based viewer for `IMG` files. `IMG` files were used in Midway game
   - point tables
   - damage tables
   - alternative palettes
+
 
 ## What does this web-app do?
 
@@ -63,6 +70,26 @@ This app might crash while loading certain files. It may display others incorrec
 - SmashTV
 - Total Carnage
 - WWF Wrestlemania
+
+### MKT N64
+
+[More details here.](packages/image-viewer/src/asm/README.md)
+
+The leak for this game contains image data in the form of basically hex dumps in assembly language files.  These images are compressed in various ways. There a lot of old, backup, or cut versions of the sprites, including some that did not appear in any version of the game.
+
+Some of the files, especially the palettes, seem to be for a different version of the game. There is a lot more manual choose of palettes and dictionaries needed for this one.
+
+### MKT PSX / PC (DOS / Windows)
+
+There has not been a leak of this game to my knowledge. This tool can load the `.dat` sprite files for both the characters and stages. Some versions name them `.bin`. 
+
+Note that the audio files are not supported, but sometimes have the same file extension. 
+
+The `.bin` files named after the characters in the root of the PC version and the `code/` folder of the PSX are not supported. They contain the animation data (the various `anitab`s) but no actual graphics. 
+
+Most characters have 3 files, plus appear in some common files such as `stances.dat`. There seem to be a lot of duplicate frames that appear in all three files. The `bq` and `fat` files themselves may appear to contain duplicate sprites within the same file, but upon closer inspection, you'll see that they have multiple image headers pointing to the same pixels.
+
+The Saturn version is not supported yet. (It appears to have the same files but encoded in big endian byte order).
 
 ### Client-side Only / Service Worker
 

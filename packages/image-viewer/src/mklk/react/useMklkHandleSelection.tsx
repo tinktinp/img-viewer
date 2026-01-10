@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/complexity/useArrowFunction: <explanation> */
 import { useCallback, useMemo } from 'react';
-import { useSelection } from '../../Selection';
+import { addSelection, removeSelection } from '../../Selection';
 import type { MklkImage, MklkSelectionObj, SpriteHeader } from '../MklkTypes';
 import { MklkDetails } from './MklkDetails';
 import { downloadFile } from '../../downloadUtils';
@@ -10,18 +10,19 @@ function indexFromId(id: string) {
     const [type, indexStr] = id.split('-');
     return {
         type,
-        index: Number.parseInt(indexStr, 10)
+        index: Number.parseInt(indexStr, 10),
     };
 }
 
-export function useMklkHandleSelection(images: MklkImage[], sprites: SpriteHeader[]) {
+export function useMklkHandleSelection(
+    images: MklkImage[],
+    sprites: SpriteHeader[],
+) {
     // biome-ignore lint/correctness/useExhaustiveDependencies: special deps
     const selectionMap: Map<string, MklkSelectionObj> = useMemo(
         () => new Map(),
         [images, sprites],
     );
-
-    const { addSelection, removeSelection } = useSelection();
 
     const getFancySelectionObj = useCallback(
         function getFancySelectionObj(id: string): MklkSelectionObj {
@@ -29,10 +30,9 @@ export function useMklkHandleSelection(images: MklkImage[], sprites: SpriteHeade
             if (fancySelectionObj !== undefined) {
                 return fancySelectionObj;
             }
-            const {type, index} = indexFromId(id);
+            const { type, index } = indexFromId(id);
             const image = type === 'img' ? images[index] : undefined;
             const sprite = type === 'sprite' ? sprites[index] : undefined;
-
 
             const newFancySelectionObj: MklkSelectionObj = {
                 image,
@@ -86,7 +86,7 @@ export function useMklkHandleSelection(images: MklkImage[], sprites: SpriteHeade
                     });
                 }
             },
-            [addSelection, removeSelection, getFancySelectionObj],
+            [getFancySelectionObj],
         );
 
     return handleMktN64Checked;

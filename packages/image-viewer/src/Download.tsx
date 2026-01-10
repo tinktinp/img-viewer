@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useSelection } from './Selection';
+import { useSelectionStore } from './Selection';
 import { useSettings } from './Settings';
 import { encodeSequenceAsGif } from './toGif';
 import { encodeAsPng } from './toPng';
@@ -10,7 +10,7 @@ export interface DownloadProps {
     imageLibrary?: ImageLibrary;
 }
 export function Download({ imageLibrary }: DownloadProps) {
-    const selection = useSelection();
+    const selection = useSelectionStore();
     const { fps, ticksPerFrame } = useSettings();
 
     const handleImageLibraryClick = useCallback(() => {

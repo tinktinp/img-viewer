@@ -1,0 +1,21 @@
+.imageCell {
+    display: grid;
+    border: 1px solid rgb(200, 200, 255);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    &:has(:checked) {
+        border-color: blue;
+    }
+
+    justify-items: center;
+    align-content: space-between;
+
+    input {
+        justify-self: right;
+    }
+}
+
+.name2 {
+    font-size: smaller;
+    color: #666;
+}

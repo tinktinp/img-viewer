@@ -1,6 +1,7 @@
 import {
     AnimationToggle,
     FpsComponent,
+    Mkt64AutoPaletteToggle,
     MktN64DictPicker,
     MktPaletteFormatPicker,
     MktPalettePicker,
@@ -15,6 +16,7 @@ export function SettingsPanel({ mode }: { mode: 'img' | 'mktn64' | 'mktpc' | 'mk
             <div className={styles.heading}>Settings</div>
             {mode === 'mktn64' && (
                 <>
+                    <Mkt64AutoPaletteToggle />
                     <MktPalettePicker />
                     <MktPaletteFormatPicker />
                     <MktN64DictPicker />

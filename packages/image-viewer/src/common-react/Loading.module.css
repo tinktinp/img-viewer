@@ -1,0 +1,33 @@
+.loading {
+    position: relative;
+    width: fit-content;
+    justify-self: start;
+}
+.loadingInner {
+    position: absolute;
+    top: -8px;
+    &::after {
+        content: "\00B7";
+        animation-name: "loadingDots";
+        animation-duration: 1.5s;
+        animation-iteration-count: infinite;
+        text-shadow:
+            #ff4400 -2px -2px 3px,
+            #ff4400 2px -2px 3px,
+            #ff4400 -2px 2px 3px,
+            #ff4400 2px 2px 3px;
+        font-size: 32px;
+    }
+}
+
+@keyframes loadingDots {
+    0% {
+        content: "\00B7";
+    }
+    33% {
+        content: "\00B7\00B7";
+    }
+    67% {
+        content: "\00B7\00B7\00B7";
+    }
+}

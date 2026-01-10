@@ -1,7 +1,7 @@
 import type { BufferPtr } from '../asm/BufferPtr';
 
 export function processOnePalette(
-    ptr: BufferPtr<Uint8Array<ArrayBufferLike>>,
+    ptr: BufferPtr,
     id = '',
 ) {
     const rgb: number[][] = [];
@@ -28,8 +28,30 @@ export function processOnePalette(
     return { id, paletteSize, rgb };
 }
 
+export function processPaletteInFormatWithSize(
+    paletteSize: number,
+    ptr: BufferPtr,
+    id = '',
+    format: PaletteFormat,
+) {
+    const rgb: number[][] = [];
+    if (paletteSize === 0) {
+        return { id, paletteSize, rgb };
+    }
+
+    for (let counter = paletteSize; counter > 0; counter--) {
+        const color = ptr.getAndInc16();
+
+        const entry = paletteEntrytoRGB(color, format);
+        entry.push(255);
+        rgb.push(entry);
+    }
+    rgb[0][3] = 0; // index zero is transparent
+    return { id, paletteSize, rgb };
+}
+
 export function processPaletteInFormat(
-    ptr: BufferPtr<Uint8Array<ArrayBufferLike>>,
+    ptr: BufferPtr,
     id = '',
     format: PaletteFormat,
 ) {
@@ -139,4 +161,15 @@ export function paletteEntrytoRGB(
     } else {
         throw new Error(`Unknown palette format ${paletteFormat}!`);
     }
+}
+export function paletteToActNumberArray(rgb: number[][]) {
+    // const buffer = new Uint8Array(data.length * 3 + 2);
+    const buffer = new Uint8Array(256 * 3 + 4);
+    rgb.forEach(([r, g, b], i) => {
+        buffer[i * 3] = r;
+        buffer[i * 3 + 1] = g;
+        buffer[i * 3 + 2] = b;
+    });
+    buffer[256 * 3] = rgb.length & 0xff;
+    return buffer;
 }
