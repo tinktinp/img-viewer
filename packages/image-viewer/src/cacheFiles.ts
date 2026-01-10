@@ -5,7 +5,7 @@ const CURRENT_CACHES = {
 
 // export type CacheData = BodyInit;
 // BodyInit is too flexible, and keeps us from using it with `URL.createObjectUrl`
-export type CacheData = BlobPart | Uint8Array;
+export type CacheData = BlobPart | Uint8Array | ArrayBufferLike;
 
 export interface CacheProps {
     data: CacheData;
@@ -42,6 +42,8 @@ export async function cacheAndBlobUrl({
     };
 }
 
+let imgCache: Cache | undefined;
+
 export async function cacheIt({ data, mimeType, url }: CacheProps) {
     if (!url || url === '/') return url;
     const headers: Record<string, string> = {
@@ -53,13 +55,16 @@ export async function cacheIt({ data, mimeType, url }: CacheProps) {
     } else if (typeof data === 'object' && 'size' in data) {
         headers['Content-Length'] = (data.size as number).toString();
     }
-    const response = new Response(data, {
+    const response = new Response(data as BodyInit, {
         status: 200,
         headers,
     });
 
-    const cache = await caches.open(CURRENT_CACHES.img);
-    await cache.put(url, response.clone());
+    if (imgCache === undefined) {
+        imgCache = await caches.open(CURRENT_CACHES.img);
+    }
+
+    await imgCache.put(url, response.clone());
 }
 
 function hasServiceWorkerActive(): boolean {
@@ -69,10 +74,14 @@ function hasServiceWorkerActive(): boolean {
 
 export const cacheUrlPrefix = '/img-cache';
 
-export function makeCacheUrl(parts: string[]) {
-    return `${cacheUrlPrefix}/${parts.join('/')}`;
+export type UrlParams = ConstructorParameters<typeof URLSearchParams>[0];
+
+export function makeCacheUrl(parts: string[], params: UrlParams = {}) {
+    const paramsStr = new URLSearchParams(params).toString();
+    return `${cacheUrlPrefix}/${parts.join('/')}?${paramsStr}`;
 }
 
-export function clearCache() {
-    caches.delete(CURRENT_CACHES.img);
+export async function clearCache() {
+    imgCache = undefined;
+    await caches.delete(CURRENT_CACHES.img);
 }

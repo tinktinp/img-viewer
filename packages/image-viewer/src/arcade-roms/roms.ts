@@ -5,6 +5,7 @@ import { encode, type ImageData as PngImageData } from 'fast-png';
 import { BufferPtr } from '../asm/BufferPtr';
 import { BitBufferRom } from '../asm/BitBuffer';
 import { processPaletteInFormat } from '../palettes/palettes';
+import { toHex } from '../utils/toHex';
 
 const littleEndian = true;
 
@@ -26,17 +27,6 @@ interface Metadata extends Ctrl {
     yOffset: number;
     pointer: number;
     paletteAddr?: number;
-}
-
-function toHex(n: number, padLen = 8): string {
-    let asStr = Math.abs(n).toString(16).padStart(padLen, '0');
-    const neg = n < 0 ? '-' : '';
-    if (asStr.length > 4) {
-        const sepIdx = asStr.length - 4;
-        asStr = `${asStr.substring(0, sepIdx)}_${asStr.substring(sepIdx, asStr.length)}`;
-    }
-    asStr = `${neg}0x${asStr}`;
-    return asStr;
 }
 
 function parseCtrl(ctrl: number): Ctrl {
@@ -286,7 +276,9 @@ export function dumpRomNode({
     const gfxLenInBits = gfxrom.byteLength * 8;
     const baseGfxAddr = mk1 ? 0x0200_0000 : 0;
 
-    const results = scanForSprites(maincpu, baseGfxAddr, gfxLenInBits, mk1);
+    const results: (Metadata & {
+        outFilename?: string;
+    })[] = scanForSprites(maincpu, baseGfxAddr, gfxLenInBits, mk1);
 
     let palette = dummyPalette;
     results.forEach((r) => {
@@ -310,7 +302,9 @@ export function dumpRomNode({
         }
         const rawData = decodeAsRaw(r, gfxrom);
         if (rawData) {
-            const outPathAndFilename = `${outFolder}${path.sep}${toHex(r.metaAddr)}-${toHex(r.pointer)}-${r.paddedWidth}x${r.height}.png`;
+            const outFilename = `${toHex(r.metaAddr)}-${toHex(r.pointer)}-${r.paddedWidth}x${r.height}.png`;
+            r.outFilename = outFilename;
+            const outPathAndFilename = `${outFolder}${path.sep}${outFilename}`;
             if (fs.existsSync(outPathAndFilename)) {
                 console.warn(
                     `Error already exists! Skipping "${outPathAndFilename}"!`,
@@ -321,6 +315,13 @@ export function dumpRomNode({
             fs.writeFileSync(outPathAndFilename, png);
         }
     });
+
+    const outPathAndFilename = `${outFolder}${path.sep}meta.json`;
+    if (fs.existsSync(outPathAndFilename)) {
+        console.warn(`Error already exists! Skipping "${outPathAndFilename}"!`);
+    }
+    const meta = JSON.stringify(results, null, 4);
+    fs.writeFileSync(outPathAndFilename, meta);
 
     return 0;
 }

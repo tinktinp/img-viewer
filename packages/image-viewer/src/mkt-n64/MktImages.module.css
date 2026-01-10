@@ -14,4 +14,14 @@
     }
 
     justify-items: center;
+    align-content: space-between;
+}
+
+.name2 {
+    font-size: smaller;
+    color: #666;
+}
+
+.palettesWrapper {
+    display: contents;
 }

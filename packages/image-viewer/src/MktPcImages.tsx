@@ -8,22 +8,29 @@ import {
     type MouseEventHandler,
     type ReactNode,
 } from 'react';
-import { imageToPng, type ImageMetaData } from './asm/filterFiles';
-import styles from './MktPcImages.module.css';
-import { encodeBufferAndPaletteArrayAsPng } from './toPng';
-import CachedPngImg from './CachedPngImg';
-import { Checkerboard } from './Checkerboard';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useSettings } from './Settings';
-import { useSelection, type FancySelectionObj } from './Selection';
 import {
-    processMktPcImageFile,
+    type ImageMetaData,
+    mktN64ImageDecompressToPng,
+} from './asm/filterFiles';
+import {
     type MktPcFileNameAndData,
     type MktPcImage,
     type MktPcPalette,
+    processMktPcImageFile,
 } from './asm/mktPcImageFile';
-import { MktPcDetails } from './MktPcDetails';
+import CachedPngImg from './CachedPngImg';
+import { Checkerboard } from './common-react/Checkerboard';
 import { downloadFile, paletteToAct } from './downloadUtils';
+import { MktPcDetails } from './MktPcDetails';
+import styles from './MktPcImages.module.css';
+import {
+    addSelection,
+    type FancySelectionObj,
+    removeSelection,
+} from './Selection';
+import { useSettings } from './Settings';
+import { encodeBufferAndPaletteArrayAsPng } from './toPng';
 
 const dummyPaletteData = [];
 for (let j = 0; j < 256; j++) {
@@ -60,8 +67,6 @@ export function MktPcImages({ selectedFile }: MktPcImagesProps) {
         () => new Map(),
         [images, palettes],
     );
-
-    const { addSelection, removeSelection } = useSelection();
 
     const getFancySelectionObj = useCallback(
         function getFancySelectionObj(id: string): MktSelectionObj {
@@ -132,7 +137,7 @@ export function MktPcImages({ selectedFile }: MktPcImagesProps) {
                     });
                 }
             },
-            [addSelection, removeSelection, getFancySelectionObj],
+            [getFancySelectionObj],
         );
     return (
         <>

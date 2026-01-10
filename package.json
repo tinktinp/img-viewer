@@ -11,7 +11,8 @@
     "iv:check": "pnpm run --filter image-viewer check",
     "iv:dev": "pnpm run --filter image-viewer dev",
     "iv:format": "pnpm run --filter image-viewer format",
-    "iv:preview": "pnpm run --filter image-viewer preview"
+    "iv:preview": "pnpm run --filter image-viewer preview",
+    "cli": "pnpm run -C packages/image-viewer cli"
   },
   "keywords": [],
   "author": "",
@@ -22,5 +23,5 @@
     "@types/node": "catalog:",
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad"
+  "packageManager": "pnpm@10.26.1+sha512.664074abc367d2c9324fdc18037097ce0a8f126034160f709928e9e9f95d98714347044e5c3164d65bd5da6c59c6be362b107546292a8eecb7999196e5ce58fa"
 }

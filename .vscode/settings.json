@@ -1,5 +1,9 @@
 {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "biomejs.biome",
-    "cSpell.words": ["bitnum", "Mklk"]
+    "editor.codeActionsOnSave": {
+        "source.organizeImports.biome": "explicit"
+    },
+    "cSpell.words": ["anitab", "bitnum", "Mklk", "subframe"],
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

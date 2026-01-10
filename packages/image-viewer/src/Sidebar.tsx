@@ -1,11 +1,16 @@
 import { Download } from './Download';
 import { ImageDetails } from './ImageDetails';
 import { ImageLibraryDetails } from './ImageLibraryDetails';
-import type { MklkFileHeader } from './mklk/MklkTypes';
 import { MklkFileDetails } from './mklk/react/MklkDetails';
 import type { MklkRef } from './mklk/react/MklkImages';
 import { PaletteDetails } from './PaletteDetails';
-import { useSelection } from './Selection';
+import {
+    useSelectionImages,
+    useSelectionPalettes,
+    useSelectionScripts,
+    useSelectionSequences,
+    useSelectionStore,
+} from './Selection';
 import { SequenceDetails } from './SequenceDetails';
 import { SettingsPanel } from './SettingsPanel';
 import type { ImageLibrary } from './useImageLibrary';
@@ -16,7 +21,9 @@ export interface SidebarProps {
     modeData: unknown;
 }
 export function Sidebar({ imageLibrary, mode, modeData }: SidebarProps) {
-    const { fancySelectionObjs } = useSelection();
+    const fancySelectionObjs = useSelectionStore(
+        (state) => state.fancySelectionObjs,
+    );
     return (
         <>
             <Download imageLibrary={imageLibrary} />
@@ -41,12 +48,10 @@ export interface ImageLibrarySidebarProps {
 export function ImageLibrarySidebar({
     imageLibrary,
 }: ImageLibrarySidebarProps) {
-    const {
-        images: selectedImages,
-        palettes: selectedPalettes,
-        sequences: selectedSequences,
-        scripts: selectedScripts,
-    } = useSelection();
+    const selectedImages = useSelectionImages();
+    const selectedPalettes = useSelectionPalettes();
+    const selectedSequences = useSelectionSequences();
+    const selectedScripts = useSelectionScripts();
     return (
         <>
             <ImageLibraryDetails

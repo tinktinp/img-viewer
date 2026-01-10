@@ -4,9 +4,10 @@
         "lib": ["ESNext", "DOM"],
         "jsx": "react-jsx"
     },
-    "include": ["src/"],
+    "include": ["src/", "src/**/*.json"],
     "exclude": [
         "src/service-worker.ts",
+        "src/web-worker.ts",
         "src/service-worker-static-routing.d.ts"
     ]
 }

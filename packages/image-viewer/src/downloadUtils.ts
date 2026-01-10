@@ -1,3 +1,4 @@
+import { paletteToActNumberArray } from './palettes/palettes';
 import { type Palettes, paletteToRgbArray } from './parse-image-header';
 
 export function downloadFile({
@@ -7,7 +8,7 @@ export function downloadFile({
 }: {
     name: string;
     type: string;
-    data: BlobPart | Uint8Array;
+    data: BlobPart | Uint8Array | ArrayBufferLike;
 }) {
     const blob = new Blob([data as BlobPart], { type });
     const url = URL.createObjectURL(blob);
@@ -36,17 +37,5 @@ export function paletteToActPalette(palette: Palettes) {
         buffer[i * 3 + 2] = b;
     });
     buffer[256 * 3] = data.length & 0xff;
-    return buffer;
-}
-
-export function paletteToActNumberArray(rgb: number[][]) {
-    // const buffer = new Uint8Array(data.length * 3 + 2);
-    const buffer = new Uint8Array(256 * 3 + 4);
-    rgb.forEach(([r, g, b], i) => {
-        buffer[i * 3] = r;
-        buffer[i * 3 + 1] = g;
-        buffer[i * 3 + 2] = b;
-    });
-    buffer[256 * 3] = rgb.length & 0xff;
     return buffer;
 }

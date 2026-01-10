@@ -36,4 +36,6 @@
     width: 18rem;
     position: sticky;
     top: 0;
+    overflow: scroll;
+    max-height: 100vh;
 }

@@ -1,4 +1,42 @@
-import type { Indexable } from './decompress';
+import { toHex } from '../utils/toHex';
+
+export type BufferOrView<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> = ArrayBufferView<TArrayBuffer> | TArrayBuffer;
+
+export interface BufferPtrOptions {
+    defaultEndianness: 'be' | 'le';
+}
+
+export interface BufferPtrParamsArrayBufferLike<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
+    buffer: TArrayBuffer;
+    bufferByteOffset?: number;
+    bufferByteLength?: number;
+}
+export interface BufferPtrParamsArrayBufferView<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
+    buffer: ArrayBufferView<TArrayBuffer>;
+}
+export type BufferPtrParamsBufferVariants<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> =
+    | BufferPtrParamsArrayBufferLike<TArrayBuffer>
+    | BufferPtrParamsArrayBufferView<TArrayBuffer>;
+
+export type BufferPtrParams<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> = BufferPtrParamsBufferVariants<TArrayBuffer> & {
+    offset?: number;
+    defaultEndianness?: 'be' | 'le';
+};
+
+// biome-ignore lint/suspicious/noShadowRestrictedNames: shadow it withitself or a placeholder
+const SharedArrayBuffer = globalThis.SharedArrayBuffer
+    ? globalThis.SharedArrayBuffer
+    : globalThis.ArrayBuffer;
 
 /**
  * a buffer and an "offset".
@@ -9,19 +47,62 @@ import type { Indexable } from './decompress';
  * This class is designed to implement a similar pattern by bundling together a buffer and an offset into it,
  * and proving read and write methods that increment.
  */
-
-export class BufferPtr<
-    T extends Indexable & {
-        length: number;
-        fill: (value: number, start?: number, end?: number) => T;
-    },
-> {
-    buffer: T;
+export class BufferPtr<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     offset: number;
+    buffer: Uint8Array<TArrayBuffer>;
+    dataView: DataView<TArrayBuffer>;
+    /** default endianness */
+    le: boolean = true;
 
-    constructor(buffer: T, offset: number = 0) {
-        this.buffer = buffer;
+    constructor(params: BufferPtrParams<TArrayBuffer>);
+    constructor(
+        buffer: TArrayBuffer | ArrayBufferView<TArrayBuffer>,
+        offset?: number,
+        options?: Partial<BufferPtrOptions>,
+    );
+    constructor(
+        bufferOrParams:
+            | TArrayBuffer
+            | ArrayBufferView<TArrayBuffer>
+            | BufferPtrParams<TArrayBuffer>,
+        offsetParam: number = 0,
+        {
+            defaultEndianness: defaultEndiannessParam = 'le',
+            ...restOfOptions
+        }: Partial<BufferPtrOptions> = {},
+    ) {
+        const params = getArgs<TArrayBuffer>(
+            bufferOrParams,
+            offsetParam,
+            defaultEndiannessParam,
+            restOfOptions,
+        );
+        const { buffer, offset, defaultEndianness } = params;
+
         this.offset = offset;
+        this.le = defaultEndianness === 'le';
+
+        if (ArrayBuffer.isView(buffer)) {
+            this.buffer = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+            this.dataView = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+        } else if (
+            buffer instanceof ArrayBuffer ||
+            buffer instanceof SharedArrayBuffer
+        ) {
+            const { bufferByteOffset, bufferByteLength } = params;
+            this.dataView = new DataView<TArrayBuffer>(
+                buffer,
+                bufferByteOffset,
+                bufferByteLength,
+            );
+            this.buffer = new Uint8Array<TArrayBuffer>(
+                buffer,
+                bufferByteOffset,
+                bufferByteLength,
+            );
+        } else {
+            throw new Error('buffer is not an ArrayBuffer or a Uint8Array!');
+        }
     }
 
     get() {
@@ -36,11 +117,24 @@ export class BufferPtr<
     putAndInc(data: number) {
         this.buffer[this.offset++] = data;
     }
-    putAndInc16(data: number) {
-        this.buffer[this.offset++] = data & 0xff;
-        this.buffer[this.offset++] = (data >>> 8) & 0xff;
+    // putAndInc16(data: number) {
+    //     this.buffer[this.offset++] = data & 0xff;
+    //     this.buffer[this.offset++] = (data >>> 8) & 0xff;
+    // }
+
+    putAndInc16(data: number, le: boolean = this.le) {
+        this.dataView.setUint16(this.offset, data, le);
+        this.offset += 2;
     }
+    putAndInc16Le(data: number) {
+        this.putAndInc16(data, true);
+    }
+    putAndInc16Be(data: number) {
+        this.putAndInc16(data, false);
+    }
+
     fill(data: number, count: number) {
+        if (!count) return;
         for (let i = 0; i < count; i++) {
             this.putAndInc(data);
         }
@@ -49,9 +143,14 @@ export class BufferPtr<
         if (this.offset < 0) return true;
         return this.offset >= this.buffer.length;
     }
-
+    get16(le: boolean = this.le) {
+        return this.dataView.getUint16(this.offset, le);
+    }
     get16Le() {
         return this.buffer[this.offset] | (this.buffer[this.offset + 1] << 8);
+    }
+    get32(le: boolean = this.le) {
+        return this.dataView.getUint32(this.offset, le);
     }
     get32Le() {
         return (
@@ -61,9 +160,19 @@ export class BufferPtr<
             (this.buffer[this.offset + 3] << 24)
         );
     }
+    getAndInc16(le: boolean = this.le) {
+        const rv = this.get16(le);
+        this.offset += 2;
+        return rv;
+    }
     getAndInc16Le() {
         const rv = this.get16Le();
         this.offset += 2;
+        return rv;
+    }
+    getAndInc32(le: boolean = this.le) {
+        const rv = this.get32(le);
+        this.offset += 4;
         return rv;
     }
     getAndInc32Le() {
@@ -80,11 +189,27 @@ export class BufferPtr<
         }
         return input;
     }
+
+    getAndIncS8Le() {
+        const rv = this.getAndInc();
+        return BufferPtr.toSigned(rv, 7);
+    }
+
+    getAndIncS16(le: boolean = this.le) {
+        const rv = this.dataView.getInt16(this.offset, le);
+        this.offset += 2;
+        return rv;
+    }
     getAndIncS16Le() {
         const rv = this.getAndInc16Le();
         return BufferPtr.toSigned(rv, 15);
     }
 
+    getAndIncS32(le: boolean = this.le) {
+        const rv = this.dataView.getInt32(this.offset, le);
+        this.offset += 4;
+        return rv;
+    }
     getAndIncS32Le() {
         const rv = this.getAndInc32Le();
         return BufferPtr.toSigned(rv, 31);
@@ -126,6 +251,49 @@ export class BufferPtr<
         const ret = this.getAsBuffer(size);
         this.offset += size;
         return ret;
+    }
+}
+
+interface BufferPtrArgs<
+    TArrayBuffer extends ArrayBufferLike = ArrayBufferLike,
+> {
+    buffer: BufferOrView<TArrayBuffer>;
+    bufferByteOffset?: number;
+    bufferByteLength?: number;
+    offset: number;
+    defaultEndianness: 'be' | 'le';
+}
+
+function getArgs<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike>(
+    bufferOrParams:
+        | ArrayBufferView<TArrayBuffer>
+        | BufferPtrParams<TArrayBuffer>
+        | TArrayBuffer,
+    offset: number,
+    defaultEndianness: 'be' | 'le',
+    restOfOptions: Omit<BufferPtrOptions, 'defaultEndianness'>,
+): BufferPtrArgs<TArrayBuffer> {
+    if (
+        !ArrayBuffer.isView(bufferOrParams) &&
+        !(bufferOrParams instanceof ArrayBuffer) &&
+        !(bufferOrParams instanceof SharedArrayBuffer) &&
+        'buffer' in bufferOrParams
+    ) {
+        const { buffer, ...params }: BufferPtrParams<TArrayBuffer> =
+            bufferOrParams;
+        return {
+            offset: 0,
+            defaultEndianness: 'le',
+            buffer,
+            ...params,
+        };
+    } else {
+        return {
+            ...restOfOptions,
+            buffer: bufferOrParams,
+            offset,
+            defaultEndianness,
+        };
     }
 }
 

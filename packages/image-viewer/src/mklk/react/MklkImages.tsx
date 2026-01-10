@@ -8,15 +8,14 @@ import {
     type ReactNode,
     type Ref,
 } from 'react';
-import styles from './MklkImages.module.css';
-import CachedPngImg from '../../CachedPngImg';
-import { Checkerboard } from '../../Checkerboard';
 import { ErrorBoundary } from 'react-error-boundary';
+import CachedPngImg from '../../CachedPngImg';
+import { Checkerboard } from '../../common-react/Checkerboard';
 import { useSettings } from '../../Settings';
-
-import type { MklkImage, SpriteHeader, UploadedFile } from '../MklkTypes';
-import { processMklkSpriteFile } from '../data/processMklkSpriteFile';
 import { encodeRgba32AsPng } from '../../toPng';
+import { processMklkSpriteFile } from '../data/processMklkSpriteFile';
+import type { MklkImage, SpriteHeader, UploadedFile } from '../MklkTypes';
+import styles from './MklkImages.module.css';
 import { useMklkHandleSelection } from './useMklkHandleSelection';
 
 interface MklkImagesProps {
@@ -112,7 +111,7 @@ export type ImageType = 'png' | 'gif';
 export interface MklkSpriteProps {
     name: string;
     spriteIndex: number;
-    spriteHeader: SpriteHeader,
+    spriteHeader: SpriteHeader;
     zoom?: number;
     filename: string;
 }
@@ -127,7 +126,11 @@ const MklkSprite = ({
     const data = useMemo(() => {
         try {
             if (spriteHeader.data)
-                return encodeRgba32AsPng(spriteHeader.data, spriteHeader.width, spriteHeader.height);
+                return encodeRgba32AsPng(
+                    spriteHeader.data,
+                    spriteHeader.width,
+                    spriteHeader.height,
+                );
         } catch (e) {
             console.log('failed to encode image!', name, spriteHeader, e);
         }

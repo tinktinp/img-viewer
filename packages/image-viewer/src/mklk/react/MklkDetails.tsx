@@ -11,6 +11,7 @@ import {
     GenericDetails,
 } from '../../GenericDetails';
 import type { MklkRef } from './MklkImages';
+import { pathAddNwbs } from '../../utils/paths';
 
 export function MklkDetails({
     selectionObj,
@@ -148,7 +149,7 @@ export function MklkFileDetails({
             label: 'Name',
             // \u{200B} is a zero width breaking space, to let long path names word wrap on the slash
             component: () => (
-                <>{filename.replaceAll(/\/|\\/g, '\u{200B}/\u{200B}')}</>
+                <>{pathAddNwbs(filename)}</>
             ),
         },
         {

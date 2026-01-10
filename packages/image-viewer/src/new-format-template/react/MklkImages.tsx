@@ -8,19 +8,17 @@ import {
     type MouseEventHandler,
     type ReactNode,
 } from 'react';
-import styles from './MklkImages.module.css';
-import CachedPngImg from '../../CachedPngImg';
-import { Checkerboard } from '../../Checkerboard';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useSettings } from '../../Settings';
-import { useSelection } from '../../Selection';
-
+import CachedPngImg from '../../CachedPngImg';
+import { Checkerboard } from '../../common-react/Checkerboard';
 import { downloadFile, paletteToAct } from '../../downloadUtils';
-
-import { MklkDetails } from './MklkDetails';
-import type { MklkImage, MklkSelectionObj } from '../MklkTypes';
-import { processMklkSpriteFile } from '../data/processMklkSpriteFile';
+import { useSelection } from '../../Selection';
+import { useSettings } from '../../Settings';
 import { encodeRgba32AsPng } from '../../toPng';
+import { processMklkSpriteFile } from '../data/processMklkSpriteFile';
+import type { MklkImage, MklkSelectionObj } from '../MklkTypes';
+import { MklkDetails } from './MklkDetails';
+import styles from './MklkImages.module.css';
 import { useMklkHandleSelection } from './useMklkHandleSelection';
 
 interface MklkImagesProps {
@@ -28,7 +26,6 @@ interface MklkImagesProps {
         name: string;
     };
 }
-
 
 export function MklkImages({ selectedFile }: MklkImagesProps) {
     const { name } = selectedFile;
@@ -89,11 +86,7 @@ const MklkImg = ({
 }: MklkImgProps) => {
     const data = useMemo(() => {
         try {
-            return encodeRgba32AsPng(
-                image.data,
-                image.width,
-                image.height,
-            );
+            return encodeRgba32AsPng(image.data, image.width, image.height);
         } catch (e) {
             console.log('failed to encode image!', name, image, e);
         }

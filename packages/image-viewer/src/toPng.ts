@@ -4,8 +4,8 @@ import {
     type ImageData as PngImageData,
 } from 'fast-png';
 import {
-    paletteBufferToRgbArray,
     type Palettes,
+    paletteBufferToRgbArray,
     paletteToRgbArray,
 } from './parse-image-header';
 import type { ImageLibrary } from './useImageLibrary';
@@ -99,17 +99,17 @@ export function encodeBufferAndPaletteArrayAsPng(
 
 export function encodeBuffersAsPng(
     data: Uint8Array,
-    palette: Uint8Array,
+    palette: Uint8Array | IndexedColors,
     paletteFormat: string,
     width: number,
     height: number,
 ) {
-    const pngPalette: IndexedColors = paletteBufferToRgbArray(
+    const pngPalette: IndexedColors = palette instanceof Uint8Array ? paletteBufferToRgbArray(
         new DataView(palette.buffer, palette.byteOffset),
         palette.byteLength / 2,
         0,
         paletteFormat,
-    );
+    ) : palette;
 
     const widthXheight = width * height;
 
@@ -133,9 +133,13 @@ export function encodeBuffersAsPng(
         palette: pngPalette,
     };
 
-    const result = encode(pngImageData);
-
-    return result;
+    try {
+        const result = encode(pngImageData);
+        return result;
+    } catch (e) {
+        console.error('abc: failed to create png!', pngImageData, e);
+        throw e;
+    }
 }
 
 export function encodePaletteAsPng({ paletteHeader, paletteData }: Palettes) {
@@ -161,6 +165,30 @@ export function encodePaletteAsPng({ paletteHeader, paletteData }: Palettes) {
         depth: 8,
         channels: 1,
         palette: pngPalette,
+    };
+
+    const result = encode(pngImageData);
+
+    return result;
+}
+
+export function encodeRgbArrayPaletteAsPng(rgba: IndexedColors) {
+    const pixelCount = rgba.length;
+    const width = 16;
+    const height = Math.ceil(pixelCount / 16);
+
+    const data = new Uint8ClampedArray(width * height);
+    for (let i = 0; i < pixelCount; i++) {
+        data[i] = i;
+    }
+
+    const pngImageData: PngImageData = {
+        width,
+        height,
+        data,
+        depth: 8,
+        channels: 1,
+        palette: rgba,
     };
 
     const result = encode(pngImageData);

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import { ErrorBoundary } from 'react-error-boundary';
 import App from './App';
+import './consume-worker';
 
 const rootEl = document.querySelector('#root');
 if (!rootEl) {

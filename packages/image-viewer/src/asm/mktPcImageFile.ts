@@ -33,7 +33,7 @@ export interface MktPcPalette {
 }
 
 export async function filterMktPcFiles(
-    files: FileList,
+    files: File[],
 ): Promise<MktPcFileNameAndData[]> {
     const outFiles = [];
     for (const file of files) {
