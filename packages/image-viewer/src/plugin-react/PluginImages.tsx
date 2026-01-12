@@ -99,7 +99,7 @@ const PluginElementsComponent = memo(function PluginElementsComponent({
 interface PluginSectionElementProps {
     sectionElement: PluginElementSection;
 }
-function PluginSectionElement(props: PluginSectionElementProps) {
+const PluginSectionElement = memo(function PluginSectionElement(props: PluginSectionElementProps) {
     const { sectionElement } = props;
     const pluginElements = usePluginElementsBySectionId(sectionElement.id);
 
@@ -116,7 +116,7 @@ function PluginSectionElement(props: PluginSectionElementProps) {
             </div>
         </>
     );
-}
+});
 
 interface PluginOnePaletteProps {
     pluginElement: PluginElementPalette;

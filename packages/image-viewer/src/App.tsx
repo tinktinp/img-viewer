@@ -6,6 +6,7 @@ import {
     useState,
 } from 'react';
 import styles from './App.module.css';
+import { ArcadeRomsPlugin } from './arcade-roms/ArcadeRomsPlugin';
 import {
     type CategorizedFiles,
     type FileNameAndData,
@@ -58,7 +59,7 @@ interface FileItem extends BasicItem {
     isPluginItem?: boolean;
 }
 
-const plugins: Plugin[] = [new MktN64Roms()];
+const plugins: Plugin[] = [new MktN64Roms(), new ArcadeRomsPlugin()];
 
 const nameRegex = /(?<main>.+?)(?<number>[0-9]*)(?<suffix>[.].*)?$/;
 function sortNames(a: string, b: string) {

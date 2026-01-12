@@ -1,9 +1,6 @@
 import type { BufferPtr } from '../asm/BufferPtr';
 
-export function processOnePalette(
-    ptr: BufferPtr,
-    id = '',
-) {
+export function processOnePalette(ptr: BufferPtr, id = '') {
     const rgb: number[][] = [];
     const paletteSize = ptr.getAndInc16Le();
     if (paletteSize === 0) {
@@ -55,7 +52,7 @@ export function processPaletteInFormat(
     id = '',
     format: PaletteFormat,
 ) {
-    const rgb: number[][] = [];
+    const rgb: [number, number, number, number][] = [];
     const paletteSize = ptr.getAndInc16Le();
     if (paletteSize === 0) {
         return { id, paletteSize, rgb };
@@ -65,8 +62,7 @@ export function processPaletteInFormat(
         const color = ptr.getAndInc16Le();
 
         const entry = paletteEntrytoRGB(color, format);
-        entry.push(255);
-        rgb.push(entry);
+        rgb.push([...entry, 255]);
     }
     rgb[0][3] = 0; // index zero is transparent
     return { id, paletteSize, rgb };

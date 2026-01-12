@@ -4,6 +4,6 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports.biome": "explicit"
     },
-    "cSpell.words": ["anitab", "bitnum", "Mklk", "subframe"],
+    "cSpell.words": ["anitab", "bitnum", "gfxrom", "Mklk", "subframe"],
     "typescript.tsdk": "node_modules/typescript/lib"
 }

@@ -199,7 +199,6 @@ function DropdownCombobox<ItemType extends BasicItem>({
 
             if (changes.isOpen) {
                 setInputValue('');
-                console.log({ changes });
                 if (changes.type === useCombobox.stateChangeTypes.InputChange) {
                 }
                 if (comboboxInputTypes.has(changes.type)) {
