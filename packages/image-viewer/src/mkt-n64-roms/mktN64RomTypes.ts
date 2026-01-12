@@ -6,9 +6,6 @@ import type {
 } from '../plugin/plugin';
 import type {
     AniCmd,
-    AniCmdFrame,
-    AniCmdSlaveAdd,
-    AniCmdSlaveAni,
     AniCmdWithFrameOffset,
 } from '../utils/aniCmd';
 import type { RomInfo } from './MktN64RomInfo';

@@ -1,11 +1,7 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { encode, type ImageData as PngImageData } from 'fast-png';
-import { BufferPtr } from '../asm/BufferPtr';
 import { BitBufferRom } from '../asm/BitBuffer';
-import { processPaletteInFormat } from '../palettes/palettes';
-import { toHex } from '../utils/toHex';
+import { BufferPtr } from '../asm/BufferPtr';
+import { dummyPalette } from './dummyPalette';
 
 const littleEndian = true;
 
@@ -18,7 +14,7 @@ interface Ctrl {
     tmult: number;
 }
 
-interface Metadata extends Ctrl {
+export interface Metadata extends Ctrl {
     metaAddr: number;
     width: number;
     paddedWidth: number;
@@ -75,10 +71,10 @@ function getMeta(
     if (paletteAddr > palBaseAddr) {
         paletteAddr -= palBaseAddr;
         if (paletteAddr % 8) {
-            console.log(
-                'warning: palette not on byte boundary! ',
-                toHex(paletteAddr),
-            );
+            // console.log(
+            //     'warning: palette not on byte boundary! ',
+            //     toHex(paletteAddr),
+            // );
         }
         paletteAddr = Math.floor(paletteAddr / 8);
     } else {
@@ -98,15 +94,17 @@ function getMeta(
 }
 
 export function scanForSprites(
-    buffer: Uint8Array,
+    buffer: Uint8Array | ArrayBufferLike,
     start: number,
-    len: number,
+    gfxromLenInBits: number,
     mk1: boolean = false,
 ) {
-    const end = start + len;
-    const dataView = new DataView(buffer.buffer, buffer.byteOffset);
+    const end = start + gfxromLenInBits;
+    const dataView = ArrayBuffer.isView(buffer)
+        ? new DataView(buffer.buffer, buffer.byteOffset)
+        : new DataView(buffer);
     const results: Metadata[] = [];
-    for (let i = 8; i < buffer.length - 4; i++) {
+    for (let i = 8; i < buffer.byteLength - 4; i++) {
         const value = dataView.getUint32(i, littleEndian); // buffer[i];
         if (value >= start && value <= end) {
             // now check previous two longs for width/height and offsets that make sense
@@ -131,24 +129,13 @@ export function scanForSprites(
     return results;
 }
 
-const dummyPalette: [number, number, number, number][] = [];
-
-for (let i = 0; i < 255; i++) {
-    dummyPalette.push([
-        (i * 4) % 256,
-        (i * 4) % 256,
-        (i * 4) % 256,
-        i === 0 ? 0 : 255,
-    ]);
-}
-
 /**
  * Extend the palette with the dummy palette to get it up to 256 bytes,
  * just in case that matters (and we're using the wrong palette).
  *
  * This is just for debugging.
  */
-function extendPalette(
+export function extendPalette(
     palette: [number, number, number, number][],
 ): [number, number, number, number][] {
     if (palette.length < 255) {
@@ -248,80 +235,25 @@ export function encodeAsPng(
     return result;
 }
 
-interface DumpRomOptions {
-    outdir: string;
-    gfxrom: string;
-    maincpu: string;
-    mk1?: boolean;
+export interface DumpRomOptions {
+    maincpu: ArrayBufferLike;
+    gfxrom: ArrayBufferLike;
+    mk1Mode?: boolean;
 }
 
-export function dumpRomNode({
-    outdir: outFolder,
-    gfxrom: gfxRomPath,
-    maincpu: mainCpuPath,
-    mk1 = false,
-}: DumpRomOptions) {
-    gfxRomPath = path.normalize(path.resolve(gfxRomPath));
-    mainCpuPath = path.normalize(path.resolve(mainCpuPath));
-    outFolder = path.normalize(path.resolve(outFolder));
-
-    if (!fs.existsSync(outFolder)) {
-        console.log('Error! outdir "%s" does not exist!', outFolder);
-        return 1;
-    }
-
-    const gfxrom = new Uint8Array(fs.readFileSync(gfxRomPath).buffer);
-    const maincpu = new Uint8Array(fs.readFileSync(mainCpuPath).buffer);
-
+export function dumpRomMetadata({
+    gfxrom,
+    maincpu,
+    mk1Mode = false,
+}: DumpRomOptions): Metadata[] {
     const gfxLenInBits = gfxrom.byteLength * 8;
-    const baseGfxAddr = mk1 ? 0x0200_0000 : 0;
-
-    const results: (Metadata & {
-        outFilename?: string;
-    })[] = scanForSprites(maincpu, baseGfxAddr, gfxLenInBits, mk1);
-
-    let palette = dummyPalette;
-    results.forEach((r) => {
-        if (r.paletteAddr) {
-            const { rgb } = processPaletteInFormat(
-                new BufferPtr(maincpu, r.paletteAddr),
-                '',
-                'XRGB1555',
-            );
-            if (
-                rgb &&
-                rgb.length > 0 &&
-                rgb.length < 255 &&
-                rgb?.[0]?.length === 4
-            ) {
-                palette = extendPalette(
-                    rgb as [number, number, number, number][],
-                );
-                // console.log('palette was %s is %s', rgb.length, palette.length);
-            }
-        }
-        const rawData = decodeAsRaw(r, gfxrom);
-        if (rawData) {
-            const outFilename = `${toHex(r.metaAddr)}-${toHex(r.pointer)}-${r.paddedWidth}x${r.height}.png`;
-            r.outFilename = outFilename;
-            const outPathAndFilename = `${outFolder}${path.sep}${outFilename}`;
-            if (fs.existsSync(outPathAndFilename)) {
-                console.warn(
-                    `Error already exists! Skipping "${outPathAndFilename}"!`,
-                );
-            }
-
-            const png = encodeAsPng(r, rawData, palette);
-            fs.writeFileSync(outPathAndFilename, png);
-        }
-    });
-
-    const outPathAndFilename = `${outFolder}${path.sep}meta.json`;
-    if (fs.existsSync(outPathAndFilename)) {
-        console.warn(`Error already exists! Skipping "${outPathAndFilename}"!`);
-    }
-    const meta = JSON.stringify(results, null, 4);
-    fs.writeFileSync(outPathAndFilename, meta);
-
-    return 0;
+    const baseGfxAddr = mk1Mode ? 0x0200_0000 : 0;
+   
+    const results: Metadata[] = scanForSprites(
+        maincpu,
+        baseGfxAddr,
+        gfxLenInBits,
+        mk1Mode,
+    );
+    return results;
 }

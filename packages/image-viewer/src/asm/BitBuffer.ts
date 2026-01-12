@@ -2,12 +2,12 @@ import type { BufferPtr } from './BufferPtr';
 import {
     type ReadMethod,
     type UnitSize,
-    unitSizeToMethod,
     unitSizeToMask,
+    unitSizeToMethod,
 } from './mktPcPovBq';
 
 export class BitBuffer {
-    input: BufferPtr<Uint8Array>;
+    input: BufferPtr<ArrayBufferLike>;
     currInput: number;
     nextInput: number;
     bitNum: number = 0x20;
@@ -15,7 +15,7 @@ export class BitBuffer {
     readonly readMethod: ReadMethod;
     readonly unitMask: number;
 
-    constructor(input: BufferPtr<Uint8Array>, unitSize: UnitSize) {
+    constructor(input: BufferPtr<ArrayBufferLike>, unitSize: UnitSize) {
         this.unitSize = unitSize;
         this.readMethod = unitSizeToMethod[unitSize];
         this.unitMask = unitSizeToMask[unitSize];
@@ -60,7 +60,7 @@ export class BitBuffer {
  * compared to the other version used for MKT N64 and PC.
  */
 export class BitBufferRom {
-    input: BufferPtr<Uint8Array>;
+    input: BufferPtr<ArrayBufferLike>;
     currInput: number;
     nextInput: number;
     bitNum: number = 0x20;
@@ -68,7 +68,7 @@ export class BitBufferRom {
     readonly readMethod: ReadMethod;
     readonly unitMask: number;
 
-    constructor(input: BufferPtr<Uint8Array>, unitSize: UnitSize) {
+    constructor(input: BufferPtr<ArrayBufferLike>, unitSize: UnitSize) {
         this.unitSize = unitSize;
         this.readMethod = unitSizeToMethod[unitSize];
         this.unitMask = unitSizeToMask[unitSize];
