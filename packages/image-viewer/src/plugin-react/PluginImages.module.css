@@ -1,4 +1,8 @@
+.sectionTitle {
+    content-visibility: auto;
+}
 .itemsContainer {
+    content-visibility: auto;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;

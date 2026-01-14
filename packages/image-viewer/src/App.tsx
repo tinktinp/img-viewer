@@ -6,6 +6,7 @@ import {
     useState,
 } from 'react';
 import styles from './App.module.css';
+import { AppHeader, type FileItem, type UploadedFile } from './AppHeader';
 import { ArcadeRomsPlugin } from './arcade-roms/ArcadeRomsPlugin';
 import {
     type CategorizedFiles,
@@ -17,11 +18,10 @@ import {
     type MktPcFileNameAndData,
 } from './asm/mktPcImageFile';
 import { clearCache } from './cacheFiles';
-import { type BasicItem, FancySelect } from './FancySelect';
 import { ForkMe } from './ForkMe';
 // import HexView from './HexView';
 import { ImageLibrary } from './ImageLibrary';
-import { Layout, LayoutHeader, LayoutMain, LayoutSidebar } from './Layout';
+import { Layout, LayoutMain, LayoutSidebar } from './Layout';
 import { MktPcImages } from './MktPcImages';
 import { MklkImages } from './mklk/react/MklkImages';
 import { MktN64Images } from './mkt-n64/MktN64Images';
@@ -46,17 +46,6 @@ declare global {
     interface FileList {
         [Symbol.iterator](): ArrayIterator<File>;
     }
-}
-
-interface UploadedFile {
-    name: string;
-    buffer: ArrayBuffer;
-    text?: string; // never present
-}
-
-interface FileItem extends BasicItem {
-    file: UploadedFile | FileNameAndData | undefined;
-    isPluginItem?: boolean;
 }
 
 const plugins: Plugin[] = [new MktN64Roms(), new ArcadeRomsPlugin()];
@@ -213,80 +202,17 @@ export function App() {
             <ForkMe />
             <div className="content">
                 <Layout>
-                    <LayoutHeader>
-                        <div style={{ marginBottom: '1rem' }}>
-                            <input
-                                onChange={handleFiles}
-                                type="file"
-                                id="file-picker"
-                                name="fileList"
-                                webkitdirectory="webkitdirectory"
-                                multiple
-                            />
-                            <FancySelect
-                                onSelectedItemChange={handleFileChosenV2}
-                                items={[
-                                    {
-                                        id: 'PLACEHOLDER',
-                                        label: 'Choose Your Destiny',
-                                        file: undefined,
-                                    },
-                                    ...files.map((f) => ({
-                                        id: f.name,
-                                        label: f.name,
-                                        file: f,
-                                    })),
-                                    ...(mktFiles?.imgData || []).map((f) => ({
-                                        id: f.name,
-                                        label: f.name,
-                                        file: f,
-                                    })),
-                                    ...mktPcFiles.map((f) => ({
-                                        id: f.name,
-                                        label: f.name,
-                                        file: f,
-                                    })),
-                                    ...mklkFiles.map((f) => ({
-                                        id: f.name,
-                                        label: f.name,
-                                        file: f,
-                                    })),
-                                    ...(flatPluginClaimedFiles as unknown as FileItem[]),
-                                ]}
-                            ></FancySelect>
-                        </div>
-                        <div
-                            style={{
-                                fontStyle: 'italic',
-                            }}
-                        >
-                            THERE IS NO KNOWLEDGE THAT IS NOT POWER
-                        </div>
-                        {(allFiles?.length || 0) > 0 &&
-                            !files.length &&
-                            !mktFiles?.imgData.length &&
-                            !mktPcFiles?.length &&
-                            !mklkFiles?.length &&
-                            !pluginItems?.length && (
-                                <>
-                                    <div className={styles.noFile}>
-                                        There is no supported file that has been
-                                        loaded.
-                                    </div>
-
-                                    <div className={styles.noFile}>
-                                        {' '}
-                                        Only IMG files are supported. And .att
-                                        files. And also .dat files and .sprite
-                                        files.
-                                    </div>
-
-                                    <div className={styles.noFile}>
-                                        You must consult the Elder Gods.
-                                    </div>
-                                </>
-                            )}
-                    </LayoutHeader>
+                    <AppHeader
+                        handleFiles={handleFiles}
+                        handleFileChosenV2={handleFileChosenV2}
+                        files={files}
+                        flatPluginClaimedFiles={flatPluginClaimedFiles}
+                        mktFiles={mktFiles}
+                        mktPcFiles={mktPcFiles}
+                        mklkFiles={mklkFiles}
+                        allFiles={allFiles}
+                        pluginItems={pluginItems}
+                    />
 
                     {emptyFile && (
                         <LayoutMain>

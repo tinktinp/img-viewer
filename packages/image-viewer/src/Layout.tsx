@@ -1,5 +1,5 @@
 import styles from './Layout.module.css';
-import { type WithChildren, withClass } from './WithChildren';
+import { withClass } from './WithChildren';
 
 export const Layout = withClass(styles.layout);
 export const LayoutHeader = withClass(styles.layoutHeader);

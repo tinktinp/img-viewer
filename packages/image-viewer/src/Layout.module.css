@@ -15,6 +15,7 @@
     position: sticky;
     top: 0;
     background-color: #fffffff0;
+    z-index: 9;
 }
 
 .layoutMain {
@@ -35,6 +36,7 @@
     gap: 1rem;
     width: 18rem;
     position: sticky;
+    z-index: 11;
     top: 0;
     overflow: scroll;
     max-height: 100vh;

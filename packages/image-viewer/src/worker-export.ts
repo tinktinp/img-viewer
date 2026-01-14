@@ -13,6 +13,7 @@ import {
     mktN64ProcessPaletteFiles,
 } from './asm/filterFiles';
 import { mktN64PaletteToPng } from './mkt-n64/MktDrawPalettePng';
+import { encodeBuffersAsPng } from './toPng'
 
 export const workerExport = {
     mktN64DecompressImage,
@@ -23,4 +24,5 @@ export const workerExport = {
     extractImageMetaDataFromAtdsMulti,
     mktN64ProcessImageFile,
     mktN64PaletteToPng,
+    encodeBuffersAsPng,
 };

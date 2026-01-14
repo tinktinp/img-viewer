@@ -1,10 +1,10 @@
 import {
     type ReactNode,
-    use,
     Suspense,
+    use,
+    useCallback,
     useEffect,
     useState,
-    useCallback,
 } from 'react';
 
 export interface OnMountProps {
@@ -49,25 +49,57 @@ export function WithPromise(props: WithPromiseProps) {
     );
 }
 
+export type ImgLoadingState = 'not-started' | 'loading' | 'complete' | 'error';
 /**
- * Hook to track loading. Uses a counter.
- * @param initialState What value to start counter at. Use 1 to start already loading.
+ * Hook to track loading.
  */
-export function useLoadingTracker(initialState: number = 0) {
-    const [loadingCounter, setLoadingCounter] = useState(initialState);
+export function useLoadingTracker() {
+    const [imgLoadingState, setImgLoadingState] =
+        useState<ImgLoadingState>('not-started');
 
-    const onLoadingStart = useCallback(() => {
-        setLoadingCounter((c) => c + 1);
+    const [isSuspended, setIsSuspended] = useState(false);
+
+    const onSuspend = useCallback(() => {
+        setIsSuspended(true);
     }, []);
-    const onLoadingComplete = useCallback(() => {
-        setLoadingCounter((c) => c - 1);
+    const onUnsuspend = useCallback(() => {
+        setIsSuspended(false);
+    }, []);
+
+    const imgRefFn = useCallback((imgEl: HTMLImageElement) => {
+        const onImgLoadComplete = () => {
+            setImgLoadingState('complete');
+        };
+        const onImgLoadError = () => {
+            setImgLoadingState('error');
+            console.log('img error');
+        };
+
+        if (imgEl) {
+            imgEl.addEventListener('load', onImgLoadComplete);
+            imgEl.addEventListener('error', onImgLoadError);
+
+            if (imgEl.complete) {
+                setImgLoadingState('complete');
+            }
+            return function cleanup() {
+                imgEl.removeEventListener('load', onImgLoadComplete);
+                imgEl.removeEventListener('error', onImgLoadError);
+            };
+        } else {
+            setImgLoadingState('not-started');
+        }
     }, []);
 
     return {
-        isLoading: loadingCounter > 0,
-        loadingCounter,
-        setLoadingCounter,
-        onLoadingStart,
-        onLoadingComplete,
+        isLoading:
+            isSuspended ||
+            imgLoadingState === 'not-started' ||
+            imgLoadingState === 'loading',
+        isSuspended,
+        onSuspend,
+        onUnsuspend,
+        imgRef: imgRefFn,
+        imgLoadingState,
     };
 }

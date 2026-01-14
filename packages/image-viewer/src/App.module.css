@@ -4,9 +4,17 @@
     gap: 8px;
 }
 
-.noFile, .nothing {
+.noFile,
+.nothing {
     padding: 1rem;
     color: darkred;
     font-weight: bold;
     font-style: italic;
+}
+
+.headerFiller {
+    width: 100%;
+}
+.headerInputWrapper {
+    margin-bottom: 1rem;
 }

@@ -4,6 +4,7 @@ import {
     type UseComboboxGetItemPropsOptions,
     type UseComboboxGetItemPropsReturnValue,
     type UseComboboxGetMenuPropsReturnValue,
+    type UseComboboxIsOpenChange,
     type UseComboboxProps,
     useCombobox,
 } from 'downshift';
@@ -161,12 +162,13 @@ const comboboxInputTypes = new Set(
     }),
 );
 
-export interface DropdownComboProps<ItemType extends BasicItem> {
+export interface FancySelectProps<ItemType extends BasicItem = BasicItem> {
     items: ItemType[];
     placeholder?: string;
     label?: ReactNode;
     defaultSelectedItem?: ItemType;
     onSelectedItemChange: UseComboboxProps<ItemType>['onSelectedItemChange'];
+    onIsOpenChange?: (changes: UseComboboxIsOpenChange<ItemType>) => void;
 }
 function DropdownCombobox<ItemType extends BasicItem>({
     items,
@@ -174,7 +176,8 @@ function DropdownCombobox<ItemType extends BasicItem>({
     label,
     onSelectedItemChange,
     defaultSelectedItem,
-}: DropdownComboProps<ItemType>) {
+    onIsOpenChange,
+}: FancySelectProps<ItemType>) {
     if (!defaultSelectedItem) {
         defaultSelectedItem = items[0];
     }
@@ -193,6 +196,7 @@ function DropdownCombobox<ItemType extends BasicItem>({
         setInputValue,
     } = useCombobox({
         onIsOpenChange: (changes) => {
+            onIsOpenChange?.(changes);
             // console.log(changes);
             const { id: menuId } = getMenuProps();
             const { id: toggleButtonId } = getToggleButtonProps();
@@ -285,7 +289,7 @@ function DropdownCombobox<ItemType extends BasicItem>({
 }
 
 type FancySelectComponent = <ItemType extends BasicItem>(
-    props: DropdownComboProps<ItemType>,
+    props: FancySelectProps<ItemType>,
 ) => JSX.Element;
 
 export const FancySelect: FancySelectComponent = DropdownCombobox;

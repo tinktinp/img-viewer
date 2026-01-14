@@ -15,6 +15,7 @@ const {
     extractImageMetaDataFromAtdsMulti,
     mktN64ProcessImageFile,
     mktN64PaletteToPng,
+    encodeBuffersAsPng,
 } = requester.table;
 
 export {
@@ -26,4 +27,5 @@ export {
     extractImageMetaDataFromAtdsMulti,
     mktN64ProcessImageFile,
     mktN64PaletteToPng,
+    encodeBuffersAsPng,
 };

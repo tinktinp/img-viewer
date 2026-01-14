@@ -2,7 +2,17 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
 /** biome-ignore-all lint/a11y/useKeyWithClickEvents: <explanation> */
 
-import { memo, useDebugValue, useEffect, useMemo, useState } from 'react';
+import {
+    memo,
+    type Ref,
+    type RefObject,
+    useCallback,
+    useDebugValue,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import CachedPngImg from '../CachedPngImg';
 import type { UrlParams } from '../cacheFiles';
 import { SelectableCell } from '../common-react/SelectableCell';
@@ -56,7 +66,10 @@ export function PluginItemInternal<Item extends PluginItem>({
         <ZoomCssProviderDisplayContents onClick={handleChecked}>
             {!!isLoading && <>Loading...</>}
             {!isLoading && (
-                <PluginElementsComponent pluginElements={pluginElements} />
+                <PluginElementsComponent
+                    pluginElements={pluginElements}
+                    isSkipped={false}
+                />
             )}
         </ZoomCssProviderDisplayContents>
     );
@@ -64,9 +77,11 @@ export function PluginItemInternal<Item extends PluginItem>({
 
 interface PluginElementsComponentProps {
     pluginElements: PluginElement[];
+    isSkipped: boolean;
 }
 const PluginElementsComponent = memo(function PluginElementsComponent({
     pluginElements,
+    isSkipped,
 }: PluginElementsComponentProps) {
     return pluginElements.map((pluginElement) => {
         if (pluginElement.type === 'palette') {
@@ -83,6 +98,7 @@ const PluginElementsComponent = memo(function PluginElementsComponent({
                     key={`img-${pluginElement.id}`}
                     pluginElement={pluginElement}
                     paletteFormat={''}
+                    isSkipped={isSkipped}
                 />
             );
         } else if (pluginElement.type === 'section') {
@@ -96,23 +112,69 @@ const PluginElementsComponent = memo(function PluginElementsComponent({
     });
 });
 
+function useIsSkipped() {
+    // visibility element reference
+    const vseRef = useRef<HTMLDivElement | null>(null);
+
+    const [isSkipped, setIsSkipped] = useState(false);
+    const handleContentVisibilityAutoStateChange = useCallback(
+        (event: Event) => {
+            const e = event as ContentVisibilityAutoStateChangeEvent;
+            setIsSkipped(e.skipped as boolean);
+        },
+        [],
+    );
+    useEffect(() => {
+        if (vseRef.current) {
+            const el = vseRef.current;
+
+            const isSkipped = !el.checkVisibility({
+                contentVisibilityAuto: true,
+            });
+            setIsSkipped(isSkipped);
+            el.addEventListener(
+                'contentvisibilityautostatechange',
+                handleContentVisibilityAutoStateChange,
+            );
+            return function cleanup() {
+                el.removeEventListener(
+                    'contentvisibilityautostatechange',
+                    handleContentVisibilityAutoStateChange,
+                );
+            };
+        }
+    }, [handleContentVisibilityAutoStateChange]);
+
+    return {
+        vseRef,
+        isSkipped,
+    };
+}
+
 interface PluginSectionElementProps {
     sectionElement: PluginElementSection;
 }
-const PluginSectionElement = memo(function PluginSectionElement(props: PluginSectionElementProps) {
+const PluginSectionElement = memo(function PluginSectionElement(
+    props: PluginSectionElementProps,
+) {
     const { sectionElement } = props;
     const pluginElements = usePluginElementsBySectionId(sectionElement.id);
 
+    const { vseRef, isSkipped } = useIsSkipped();
+
     return (
         <>
-            <div>
+            <div className={styles.sectionTitle}>
                 {sectionElement.name}
                 {sectionElement.name2 && (
                     <div className={styles.name2}>sectionElement.name2</div>
                 )}
             </div>
-            <div className={styles.itemsContainer}>
-                <PluginElementsComponent pluginElements={pluginElements} />
+            <div ref={vseRef} className={styles.itemsContainer}>
+                <PluginElementsComponent
+                    pluginElements={pluginElements}
+                    isSkipped={isSkipped}
+                />
             </div>
         </>
     );
@@ -126,8 +188,7 @@ const PluginOnePalette = memo(function PluginOnePalette({
     pluginElement: palette,
     paletteFormat,
 }: PluginOnePaletteProps) {
-    const { onLoadingStart, onLoadingComplete, isLoading } =
-        useLoadingTracker(1);
+    const { onSuspend, onUnsuspend, imgRef, isLoading } = useLoadingTracker();
 
     return (
         <SelectableCell
@@ -143,8 +204,9 @@ const PluginOnePalette = memo(function PluginOnePalette({
                 urlParams={{
                     paletteFormat,
                 }}
-                onLoadingStart={onLoadingStart}
-                onLoadingComplete={onLoadingComplete}
+                onSuspend={onSuspend}
+                onUnsuspend={onUnsuspend}
+                imgRef={imgRef}
             />
         </SelectableCell>
     );
@@ -155,15 +217,17 @@ const PluginDrawPalettePng = ({
     paletteFormat,
     urlParts,
     urlParams,
-    onLoadingStart,
-    onLoadingComplete,
+    onSuspend,
+    onUnsuspend,
+    imgRef,
 }: {
     pluginElement: PluginElementPalette;
     paletteFormat: string;
     urlParts: string[];
     urlParams?: UrlParams;
-    onLoadingStart: () => void;
-    onLoadingComplete: () => void;
+    onSuspend: () => void;
+    onUnsuspend: () => void;
+    imgRef: Ref<HTMLImageElement>;
 }) => {
     const data = useMemo(async () => {
         const rgba = await pluginElement.rgba({ paletteFormat });
@@ -173,8 +237,8 @@ const PluginDrawPalettePng = ({
     return (
         <WithPromise
             promise={data}
-            onSuspend={onLoadingStart}
-            onUnsuspend={onLoadingComplete}
+            onSuspend={onSuspend}
+            onUnsuspend={onUnsuspend}
         >
             <CachedPngImg
                 data={data}
@@ -184,7 +248,7 @@ const PluginDrawPalettePng = ({
                 zoomMult={8}
                 width={16}
                 mimeType="image/png"
-                onLoaded={onLoadingComplete}
+                imgRef={imgRef}
             />
         </WithPromise>
     );
@@ -194,15 +258,17 @@ export interface PluginImgProps {
     pluginElement: PluginElementImage;
 
     paletteFormat: string;
-    onLoadingStart: () => void;
-    onLoadingComplete: () => void;
+    onSuspend: () => void;
+    onUnsuspend: () => void;
+    imgRef: Ref<HTMLImageElement | null>;
 }
 
 const PluginImg = memo(function PluginImg({
     pluginElement,
     paletteFormat,
-    onLoadingStart,
-    onLoadingComplete,
+    onSuspend,
+    onUnsuspend,
+    imgRef,
 }: PluginImgProps) {
     const data = useMemo(() => {
         try {
@@ -230,8 +296,8 @@ const PluginImg = memo(function PluginImg({
     return (
         <WithPromise
             promise={data}
-            onSuspend={onLoadingStart}
-            onUnsuspend={onLoadingComplete}
+            onSuspend={onSuspend}
+            onUnsuspend={onUnsuspend}
         >
             <CachedPngImg
                 data={data}
@@ -240,7 +306,7 @@ const PluginImg = memo(function PluginImg({
                 name={pluginElement.name}
                 width={pluginElement.width || 150}
                 height={pluginElement.height}
-                onLoaded={onLoadingComplete}
+                imgRef={imgRef}
             />
         </WithPromise>
     );
@@ -249,14 +315,18 @@ const PluginImg = memo(function PluginImg({
 interface PluginImgGridCellProps {
     pluginElement: PluginElementImage;
     paletteFormat: string;
+    isSkipped: boolean;
 }
 
 const PluginImgGridCell = memo(function PluginImgGridCell({
     pluginElement,
     paletteFormat,
+    isSkipped,
 }: PluginImgGridCellProps) {
-    const { onLoadingStart, onLoadingComplete, isLoading } =
-        useLoadingTracker(1);
+    const { isLoading, onSuspend, onUnsuspend, imgRef } = useLoadingTracker();
+
+    // once we finish loading, don't un-render the image
+    const omitImage = isSkipped && isLoading;
 
     return (
         <SelectableCell
@@ -267,14 +337,15 @@ const PluginImgGridCell = memo(function PluginImgGridCell({
             height={pluginElement.height}
             isLoading={isLoading}
         >
-            {
+            {!omitImage && (
                 <PluginImg
                     pluginElement={pluginElement}
                     paletteFormat={paletteFormat}
-                    onLoadingStart={onLoadingStart}
-                    onLoadingComplete={onLoadingComplete}
+                    onSuspend={onSuspend}
+                    onUnsuspend={onUnsuspend}
+                    imgRef={imgRef}
                 />
-            }
+            )}
             {pluginElement.noticeMessage && (
                 <div style={{ backgroundColor: 'white' }}>
                     {pluginElement.noticeMessage}
@@ -303,7 +374,7 @@ function usePluginElements(pluginItem: PluginItem) {
         const controller = new AbortController();
         const { signal } = controller;
 
-        console.log('usePluginElements called');
+        // console.log('usePluginElements called');
         pluginItem.addEventListener(
             'elements-loaded',
             ({ pluginElements }) => {
