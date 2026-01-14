@@ -5,7 +5,7 @@ export interface LoadingProps {
 }
 
 export function LoadingInner() {
-    return <div className={styles.loadingInner}></div>;
+    return <div className={styles.loadingInner}>Loading...</div>;
 }
 export function Loading({ isLoading = true }: LoadingProps) {
     if (!isLoading) return null;

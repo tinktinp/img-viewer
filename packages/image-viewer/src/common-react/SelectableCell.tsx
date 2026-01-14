@@ -50,8 +50,8 @@ export const SelectableCell = memo(function SelectableCell({
     const checkerboardProps = useMemo(() => {
         const props: { style?: CSSProperties } = {
             style: {
-                minWidth: width && `calc(${width}px * var(--zoom))`,
-                minHeight: height && `calc(${height}px * var(--zoom))`,
+                width: width && `calc(${width}px * var(--zoom))`,
+                height: height && `calc(${height}px * var(--zoom))`,
             },
         };
 

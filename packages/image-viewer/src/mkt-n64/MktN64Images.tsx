@@ -10,6 +10,7 @@ import {
     useEffect,
     useMemo,
     useState,
+    type Ref,
 } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -372,8 +373,9 @@ export interface MktImgProps {
     mktDictIndex: number;
     meta?: ImageMetaData;
     filename: string;
-    onLoadingStart: () => void;
-    onLoadingComplete: () => void;
+    onSuspend: () => void;
+    onUnsuspend: () => void;
+    imgRef: Ref<HTMLImageElement>;
 }
 
 const MktImg = memo(function MktN64Img({
@@ -386,8 +388,9 @@ const MktImg = memo(function MktN64Img({
     paletteIndex,
     paletteFormat,
     filename,
-    onLoadingStart,
-    onLoadingComplete,
+    onSuspend,
+    onUnsuspend,
+    imgRef,
 }: MktImgProps) {
     const data = useMemo(() => {
         try {
@@ -434,8 +437,8 @@ const MktImg = memo(function MktN64Img({
     return (
         <WithPromise
             promise={data}
-            onSuspend={onLoadingStart}
-            onUnsuspend={onLoadingComplete}
+            onSuspend={onSuspend}
+            onUnsuspend={onUnsuspend}
         >
             <CachedPngImg
                 data={data}
@@ -444,7 +447,7 @@ const MktImg = memo(function MktN64Img({
                 name={name}
                 width={meta?.width || 150}
                 height={meta?.height}
-                onLoaded={onLoadingComplete}
+                imgRef={imgRef}
             />
         </WithPromise>
     );
@@ -475,8 +478,7 @@ const MktN64ImgGridCell = memo(function MktN64ImgGridCell({
     mktPalette,
     selectedFile,
 }: MktN64ImgGridCellProps) {
-    const { onLoadingStart, onLoadingComplete, isLoading } =
-        useLoadingTracker(1);
+    const { onSuspend, onUnsuspend, imgRef, isLoading } = useLoadingTracker();
     const meta = chooseMeta(metaMultiMap, image);
     // const meta = metaMap.get(image.label);
 
@@ -502,8 +504,9 @@ const MktN64ImgGridCell = memo(function MktN64ImgGridCell({
                     paletteFormat={mktPaletteFormat}
                     paletteIndex={mktPalette}
                     filename={selectedFile.name}
-                    onLoadingStart={onLoadingStart}
-                    onLoadingComplete={onLoadingComplete}
+                    onSuspend={onSuspend}
+                    onUnsuspend={onUnsuspend}
+                    imgRef={imgRef}
                 />
             }
             {!meta && (

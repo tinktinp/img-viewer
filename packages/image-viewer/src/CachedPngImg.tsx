@@ -1,6 +1,7 @@
 import {
     type MouseEventHandler,
     type ReactEventHandler,
+    type Ref,
     use,
     useCallback,
     useMemo,
@@ -19,6 +20,7 @@ export interface CachedPngImgProps {
     height?: number;
     mimeType: string;
     onLoaded?: () => void;
+    imgRef?: Ref<HTMLImageElement>
 }
 
 const preventDefaultAndBubble: MouseEventHandler<HTMLAnchorElement> = (e) => {
@@ -42,6 +44,7 @@ export function CachedPngImg({
     height,
     mimeType = 'image/png',
     onLoaded,
+    imgRef,
 }: CachedPngImgProps) {
     if (isPromise(data)) {
         data = use(data) || new ArrayBuffer();
@@ -113,6 +116,7 @@ export function CachedPngImg({
                     loading="lazy"
                     onLoad={handleLoad}
                     onError={handleError}
+                    ref={imgRef}
                 />
             </a>
         );

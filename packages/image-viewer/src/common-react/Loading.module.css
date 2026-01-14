@@ -3,7 +3,11 @@
     width: fit-content;
     justify-self: start;
 }
+
 .loadingInner {
+    position: absolute;
+}
+/* .loadingInner {
     position: absolute;
     top: -8px;
     &::after {
@@ -30,4 +34,4 @@
     67% {
         content: "\00B7\00B7\00B7";
     }
-}
+} */

@@ -1,5 +1,6 @@
+// import { encodeBuffersAsPng } from '../toPng';
+import { encodeBuffersAsPng } from '../consume-worker';
 import type { PluginElementImage, PluginElementPalette } from '../plugin';
-import { encodeBuffersAsPng } from '../toPng';
 import { toHex } from '../utils/toHex';
 import type { ArcadeRomsItem } from './ArcadeRomsItem';
 import { type Metadata } from './roms';
@@ -36,7 +37,7 @@ export function makeArcadeRomsElementImage(
 
 async function imgElementToPng(this: ArcadeRomsElementImage) {
     const m = this.metadata;
-    const pngUint8Array = encodeBuffersAsPng(
+    const pngUint8Array = await encodeBuffersAsPng(
         this.indexedPixelData,
         this.palette.rgbaData,
         '',
