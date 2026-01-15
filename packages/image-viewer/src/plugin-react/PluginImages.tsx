@@ -36,6 +36,7 @@ import {
     useStoreFromContext,
 } from './store';
 import { usePluginHandleSelection } from './usePluginHandleSelection';
+import { PluginMeshGridCell } from './PluginMeshGridCell';
 
 export interface PluginItemProps<Item> {
     selectedItem: Item;
@@ -98,6 +99,14 @@ const PluginElementsComponent = memo(function PluginElementsComponent({
                     key={`img-${pluginElement.id}`}
                     pluginElement={pluginElement}
                     paletteFormat={''}
+                    isSkipped={isSkipped}
+                />
+            );
+        } else if (pluginElement.type === 'mesh') {
+            return (
+                <PluginMeshGridCell
+                    key={`mesh-${pluginElement.id}`}
+                    pluginElement={pluginElement}
                     isSkipped={isSkipped}
                 />
             );

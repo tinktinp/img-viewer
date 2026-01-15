@@ -1,4 +1,6 @@
 import { useCallback, useState } from 'react';
+import { Scene } from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { downloadFile, paletteToAct } from '../downloadUtils';
 import type { PluginElement } from '../plugin/plugin';
 import {
@@ -8,6 +10,8 @@ import {
 } from '../Selection';
 import { PluginSidebarDetails } from './PluginSidebarDetails';
 import { useGetStoreFromContext } from './store';
+
+const gltfExporter = new GLTFExporter();
 
 export function usePluginHandleSelection() {
     const store = useGetStoreFromContext();
@@ -79,6 +83,22 @@ export class PluginFancySelectionObj implements FancySelectionObj {
                     });
                 }
                 break;
+            case 'mesh': {
+                const mesh = await pe.toMesh?.();
+                if (mesh) {
+                    const scene = new Scene();
+                    scene.add(mesh);
+                    const data = (await gltfExporter.parseAsync(scene, {
+                        binary: true,
+                    })) as ArrayBuffer;
+
+                    downloadFile({
+                        name: `${pe.name}.glb`,
+                        type: 'model/gltf-binary',
+                        data,
+                    });
+                }
+            }
         }
     };
 

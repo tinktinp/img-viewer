@@ -66,7 +66,6 @@ export function AppHeader(props: AppHeaderProps) {
             if (changes.isOpen && headerRef.current) {
                 const rect = headerRef.current.getBoundingClientRect();
                 const { left, top, height } = rect;
-                console.log(rect);
                 setHeaderStylesOverride({
                     position: 'fixed',
                     left,

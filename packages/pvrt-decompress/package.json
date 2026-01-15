@@ -1,0 +1,13 @@
+{
+  "name": "@tinktinp/pvrt-decompress",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run build:wasm && pnpm run build:tsc && cp -a src/build/*.wasm dist/build/",
+    "build:tsc": "tsc --build ./tsconfig.lib.json --verbose",
+    "build:wasm": "./build.sh"
+  },
+  "exports": {
+    "import": "./src/index.ts"
+  }
+}

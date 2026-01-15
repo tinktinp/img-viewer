@@ -83,8 +83,16 @@ export class BufferPtr<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
         this.le = defaultEndianness === 'le';
 
         if (ArrayBuffer.isView(buffer)) {
-            this.buffer = new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-            this.dataView = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+            this.buffer = new Uint8Array(
+                buffer.buffer,
+                buffer.byteOffset,
+                buffer.byteLength,
+            );
+            this.dataView = new DataView(
+                buffer.buffer,
+                buffer.byteOffset,
+                buffer.byteLength,
+            );
         } else if (
             buffer instanceof ArrayBuffer ||
             buffer instanceof SharedArrayBuffer
@@ -160,6 +168,15 @@ export class BufferPtr<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
             (this.buffer[this.offset + 3] << 24)
         );
     }
+
+    getFloat32(le: boolean = this.le) {
+        return this.dataView.getFloat32(this.offset, le);
+    }
+
+    get64(le: boolean = this.le) {
+        return this.dataView.getBigUint64(this.offset, le);
+    }
+
     getAndInc16(le: boolean = this.le) {
         const rv = this.get16(le);
         this.offset += 2;
@@ -178,6 +195,18 @@ export class BufferPtr<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
     getAndInc32Le() {
         const rv = this.get32Le();
         this.offset += 4;
+        return rv;
+    }
+
+    getAndIncFloat32(le: boolean = this.le) {
+        const rv = this.getFloat32(le);
+        this.offset += 4;
+        return rv;
+    }
+
+    getAndInc64(le: boolean = this.le) {
+        const rv = this.get64(le);
+        this.offset += 8;
         return rv;
     }
 

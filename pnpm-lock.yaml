@@ -47,6 +47,9 @@ importers:
       '@tanstack/react-virtual':
         specifier: ^3.13.13
         version: 3.13.13(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tinktinp/pvrt-decompress':
+        specifier: 'workspace:'
+        version: link:../pvrt-decompress
       '@types/react-dom':
         specifier: ^19.1.6
         version: 19.1.6(@types/react@19.1.8)
@@ -99,6 +102,8 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
+
+  packages/pvrt-decompress: {}
 
 packages:
 
