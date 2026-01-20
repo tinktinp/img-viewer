@@ -1,3 +1,5 @@
+import type { Mesh } from 'three';
+
 /**
  * This is a simpler version of `PluginItem` that omits `EventTarget`
  * and `loadElements`.
@@ -129,15 +131,16 @@ export type PluginElement =
     | PluginElementImage
     | PluginElementPalette
     | PluginElementAnimation
+    | PluginElementMesh
     | PluginElementSection;
 
 export interface PluginElementBase {
     type: PluginElementType;
     /**
      * A unique id, to use for React `key`s or the `value` prop of checkboxes, etc.
-     * 
+     *
      * This `id` is unique before applying any settings.
-     * 
+     *
      * I may add a second `id` later on to express "a palette with xrgba format applied"
      * or "an image with palette xyz_p (in format xrgba)", where different settings should
      * have different ids. But for this one, they should be the same.
@@ -153,7 +156,12 @@ export interface PluginElementBase {
     noticeMessage?: string;
     details?: () => Promise<PluginDetailsObj>;
 }
-export type PluginElementType = 'image' | 'palette' | 'animation' | 'section';
+export type PluginElementType =
+    | 'image'
+    | 'palette'
+    | 'animation'
+    | 'mesh'
+    | 'section';
 
 /**
  * This is a way of grouping other elements together.
@@ -183,6 +191,12 @@ export interface PluginElementAnimation extends PluginElementBase {
     type: 'animation';
     toPng?: () => Promise<ArrayBufferLike>;
     toGif?: () => Promise<ArrayBufferLike>;
+}
+
+export interface PluginElementMesh extends PluginElementBase {
+    type: 'mesh';
+
+    toMesh?: (setting?: unknown) => Promise<Mesh>;
 }
 
 /**

@@ -34,6 +34,8 @@ import { clearSelection } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
 import { Sidebar } from './Sidebar';
+import { sortNames } from './utils/sortNames';
+import { Umk3IosPlugin } from './umk3-ios/Umk3IosPlugin';
 import { useImageLibrary } from './useImageLibrary';
 
 declare module 'react' {
@@ -48,39 +50,11 @@ declare global {
     }
 }
 
-const plugins: Plugin[] = [new MktN64Roms(), new ArcadeRomsPlugin()];
-
-const nameRegex = /(?<main>.+?)(?<number>[0-9]*)(?<suffix>[.].*)?$/;
-function sortNames(a: string, b: string) {
-    const aPieces = a.match(nameRegex)?.groups as {
-        main: string;
-        number: string;
-        suffix: string;
-    };
-    const bPieces = b.match(nameRegex)?.groups as {
-        main: string;
-        number: string;
-        suffix: string;
-    };
-    if (aPieces.suffix === bPieces.suffix) {
-        if (aPieces.main === bPieces.main) {
-            const an = Number.parseInt(aPieces.number);
-            const bn = Number.parseInt(bPieces.number);
-
-            if (an === bn) return 0;
-            else if (an < bn) return -1;
-            else return 1;
-        } else if (aPieces.main < bPieces.main) {
-            return -1;
-        } else {
-            return 1;
-        }
-    } else if (aPieces.suffix < bPieces.suffix) {
-        return -1;
-    } else {
-        return 1;
-    }
-}
+const plugins: Plugin[] = [
+    new MktN64Roms(),
+    new ArcadeRomsPlugin(),
+    new Umk3IosPlugin(),
+];
 
 function usePluginItems() {
     const [pluginItems, setPluginItems] = useState<
@@ -144,7 +118,7 @@ export function App() {
             const uploadedFiles: { name: string; buffer: ArrayBuffer }[] = [];
             const mklkFiles = [];
             const files: File[] = Array.from(e.target.files).sort((a, b) =>
-                sortNames(a.name, b.name),
+                sortNames(a.webkitRelativePath, b.webkitRelativePath),
             );
 
             for (const file of files) {

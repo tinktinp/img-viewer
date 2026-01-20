@@ -137,6 +137,7 @@ A rough list of future enhancements.
 
 - ermaccer
   - I used ermaccer's [midway.img](https://github.com/ermaccer/midway.img) as a reference at times, especially for working out how to convert the palettes from 15 bit to 24 bit
+  - And a few other things, including [UMK3IOS.MeshSetTool](https://github.com/ermaccer/UMK3IOS.MeshSetTool)
 - leanny
 - nacho
 - the Tablet Of Knowledge

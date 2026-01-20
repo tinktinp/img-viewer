@@ -64,6 +64,24 @@ export function encodeRgba32AsPng(
     return result;
 }
 
+export function encodeRgb32AsPng(
+    data: Uint8Array,
+    width: number,
+    height: number,
+) {
+    const pngImageData: PngImageData = {
+        width,
+        height,
+        data,
+        depth: 8,
+        channels: 3,
+    };
+
+    const result = encode(pngImageData);
+
+    return result;
+}
+
 export function encodeBufferAndPaletteArrayAsPng(
     data: Uint8Array,
     palette: number[][],

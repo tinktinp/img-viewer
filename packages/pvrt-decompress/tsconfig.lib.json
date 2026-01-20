@@ -1,0 +1,15 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "lib": ["ESNext", "DOM"],
+        "jsx": "react-jsx",
+        "emitDeclarationOnly": false,
+        "allowImportingTsExtensions": false,
+        "allowJs": true,
+        "rootDir": "src/",
+        "tsBuildInfoFile": "dist/tsconfig.lib.tsbuildinfo",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false
+    },
+    "include": ["src/", "src/**/*.json"]
+}
