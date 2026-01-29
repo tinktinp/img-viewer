@@ -83,22 +83,37 @@ export class PluginFancySelectionObj implements FancySelectionObj {
                     });
                 }
                 break;
-            case 'mesh': {
-                const mesh = await pe.toMesh?.();
-                if (mesh) {
-                    const scene = new Scene();
-                    scene.add(mesh);
-                    const data = (await gltfExporter.parseAsync(scene, {
-                        binary: true,
-                    })) as ArrayBuffer;
+            case 'mesh':
+                {
+                    const mesh = await pe.toMesh?.();
+                    if (mesh) {
+                        const scene = new Scene();
+                        scene.add(mesh);
+                        const data = (await gltfExporter.parseAsync(scene, {
+                            binary: true,
+                        })) as ArrayBuffer;
 
-                    downloadFile({
-                        name: `${pe.name}.glb`,
-                        type: 'model/gltf-binary',
-                        data,
-                    });
+                        downloadFile({
+                            name: `${pe.name}.glb`,
+                            type: 'model/gltf-binary',
+                            data,
+                        });
+                    }
                 }
-            }
+                break;
+
+            case 'audio':
+                {
+                    const wavData = await pe.toWav?.();
+                    if (wavData) {
+                        downloadFile({
+                            name: `${pe.name}.wav`,
+                            type: 'audio/wave',
+                            data: wavData,
+                        });
+                    }
+                }
+                break;
         }
     };
 

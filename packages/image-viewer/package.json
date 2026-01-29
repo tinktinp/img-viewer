@@ -29,6 +29,7 @@
         "@tanstack/react-store": "^0.8.0",
         "@tanstack/react-virtual": "^3.13.13",
         "@tinktinp/pvrt-decompress": "workspace:",
+        "@tinktinp/dcs-decoder": "workspace:",
         "@types/react-dom": "^19.1.6",
         "downshift": "^9.0.13",
         "fast-png": "^7.0.0",

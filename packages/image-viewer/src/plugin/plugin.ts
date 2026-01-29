@@ -45,6 +45,10 @@ export interface PluginItem extends PluginItemProps, PluginItemEventHandlers {
      */
     loadElements: () => void;
     // cancelLoadElements: (h: LoadElementsHandle) => void;
+    /**
+     * Optional method to free resources when unloading the item.
+     */
+    unload?: () => Promise<void>;
 }
 
 export class ElementsLoadedEvent extends Event {
@@ -132,6 +136,7 @@ export type PluginElement =
     | PluginElementPalette
     | PluginElementAnimation
     | PluginElementMesh
+    | PluginElementAudio
     | PluginElementSection;
 
 export interface PluginElementBase {
@@ -161,6 +166,7 @@ export type PluginElementType =
     | 'palette'
     | 'animation'
     | 'mesh'
+    | 'audio'
     | 'section';
 
 /**
@@ -197,6 +203,14 @@ export interface PluginElementMesh extends PluginElementBase {
     type: 'mesh';
 
     toMesh?: (setting?: unknown) => Promise<Mesh>;
+}
+
+export type Wav = Uint8Array;
+
+export interface PluginElementAudio extends PluginElementBase {
+    type: 'audio';
+
+    toWav?: (setting?: unknown) => Promise<Wav>;
 }
 
 /**

@@ -27,7 +27,9 @@ import type {
 import { useSettingsOpt } from '../Settings';
 import { encodeRgbArrayPaletteAsPng } from '../toPng';
 import { useLoadingTracker, WithPromise } from '../WithPromise';
+import { PluginAudioCell } from './PluginAudioCell';
 import styles from './PluginImages.module.css';
+import { PluginMeshGridCell } from './PluginMeshGridCell';
 import {
     createDefaultStateObject,
     StoreProvider,
@@ -36,7 +38,6 @@ import {
     useStoreFromContext,
 } from './store';
 import { usePluginHandleSelection } from './usePluginHandleSelection';
-import { PluginMeshGridCell } from './PluginMeshGridCell';
 
 export interface PluginItemProps<Item> {
     selectedItem: Item;
@@ -110,6 +111,14 @@ const PluginElementsComponent = memo(function PluginElementsComponent({
                     isSkipped={isSkipped}
                 />
             );
+        } else if (pluginElement.type === 'audio') {
+            return (
+                <PluginAudioCell
+                    key={`audio-${pluginElement.id}`}
+                    pluginElement={pluginElement}
+                    isSkipped={isSkipped}
+                />
+            );
         } else if (pluginElement.type === 'section') {
             return (
                 <PluginSectionElement
@@ -176,7 +185,7 @@ const PluginSectionElement = memo(function PluginSectionElement(
             <div className={styles.sectionTitle}>
                 {sectionElement.name}
                 {sectionElement.name2 && (
-                    <div className={styles.name2}>sectionElement.name2</div>
+                    <div className={styles.name2}>{sectionElement.name2}</div>
                 )}
             </div>
             <div ref={vseRef} className={styles.itemsContainer}>

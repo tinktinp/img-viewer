@@ -91,6 +91,11 @@ Most characters have 3 files, plus appear in some common files such as `stances.
 
 The Saturn version is not supported yet. (It appears to have the same files but encoded in big endian byte order).
 
+### DCS Audio
+See [DCS Audio](packages/image-viewer/src/plugins/dcs/README.md).
+
+It allows playing back of the audio streams from the arcade roms using Michael Roberts's [DCSExplorer](https://github.com/mjrgh/DCSExplorer) under the hood.
+
 ### Client-side Only / Service Worker
 
 This web app is client or browser only; there is no server side code. It does need
