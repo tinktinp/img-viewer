@@ -53,11 +53,12 @@ export class DcsItem
         ]);
 
         this.dispatchElementsLoaded(
-            streams.map((s) =>
+            streams.map((s, idx) =>
                 makeDcsElementAudio({
                     item: this,
                     sectionId: 'streams',
                     streamId: s,
+                    streamIdx: idx,
                 }),
             ),
         );
@@ -72,32 +73,24 @@ async function loadRoms(item: DcsItem) {
     for (const rom of roms) {
         const romNumber = getRomNumber(rom);
         decoder.addRom(romNumber, new Uint8Array(await rom.arrayBuffer()));
-        console.log(
-            'added rom ',
-            rom.webkitRelativePath,
-            'as romNumber',
-            romNumber,
-        );
+        // console.log(
+        //     'added rom ',
+        //     rom.webkitRelativePath,
+        //     'as romNumber',
+        //     romNumber,
+        // );
     }
-    console.log(decoder);
     const checkRomsResult = decoder.checkRoms();
-    console.log(decoder.checkRoms());
+    console.log('checkRomsResult', decoder.checkRoms());
     if (checkRomsResult === 1) {
-        console.log('success');
         decoder.softBoot();
         const sig = decoder.getSignature();
-        console.log(sig);
+        console.log({sig});
         const maxTrackNumber = decoder.getMaxTrackNumber();
-        console.log(maxTrackNumber);
+        console.log({maxTrackNumber});
         const streams: number[] = decoder.listStreams();
         console.log('streams', streams);
         return { sig, maxTrackNumber, streams };
-        // const buffer = decoder.extractStream(streams[0]).slice(0);
-        // console.log(buffer);
-        // const url = URL.createObjectURL(
-        //     new Blob([buffer], { type: 'audio/wave' }),
-        // );
-        // console.log(url);
     }
     return { sig: '', maxTrackNumber: 0, streams: [] };
 }
