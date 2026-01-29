@@ -34,9 +34,10 @@ import { clearSelection } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
 import { Sidebar } from './Sidebar';
-import { sortNames } from './utils/sortNames';
 import { Umk3IosPlugin } from './umk3-ios/Umk3IosPlugin';
 import { useImageLibrary } from './useImageLibrary';
+import { sortNames } from './utils/sortNames';
+import { DcsPlugin } from './plugins/dcs/DcsPlugin';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
@@ -54,6 +55,7 @@ const plugins: Plugin[] = [
     new MktN64Roms(),
     new ArcadeRomsPlugin(),
     new Umk3IosPlugin(),
+    new DcsPlugin(),
 ];
 
 function usePluginItems() {

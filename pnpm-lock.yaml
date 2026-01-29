@@ -36,6 +36,8 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
+  packages/dcs-decoder: {}
+
   packages/image-viewer:
     dependencies:
       '@nick/lz4':
@@ -47,6 +49,9 @@ importers:
       '@tanstack/react-virtual':
         specifier: ^3.13.13
         version: 3.13.13(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@tinktinp/dcs-decoder':
+        specifier: 'workspace:'
+        version: link:../dcs-decoder
       '@tinktinp/pvrt-decompress':
         specifier: 'workspace:'
         version: link:../pvrt-decompress
