@@ -85,7 +85,7 @@ async function loadRoms(item: DcsItem) {
     if (checkRomsResult === 1) {
         decoder.softBoot();
         const sig = decoder.getSignature();
-        console.log({ sig });
+        // console.log({ sig });
         const maxTrackNumber = decoder.getMaxTrackNumber();
         console.log({ maxTrackNumber });
         const streams: number[] = decoder.listStreams();

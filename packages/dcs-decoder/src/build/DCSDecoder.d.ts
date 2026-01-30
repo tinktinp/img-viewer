@@ -61,6 +61,7 @@ export interface DCSDecoderWasm extends ClassHandle {
   getMaxTrackNumber(): number;
   setMasterVolume(_0: number): void;
   addRom(_0: number, _1: Uint8Array): void;
+  getStreamInfo(_0: number): DCSDecoderNativeStreamInfo;
   extractStream(_0: number): Uint8Array;
   getSignature(): string;
   listStreams(): any;
@@ -81,6 +82,13 @@ export interface VectorROMPointer extends ClassHandle {
   get(_0: number): DCSDecoderROMPointer | undefined;
   set(_0: number, _1: DCSDecoderROMPointer): boolean;
 }
+
+export type DCSDecoderNativeStreamInfo = {
+  nFrames: number,
+  nBytes: number,
+  formatType: number,
+  formatSubType: number
+};
 
 export type DCSDecoderROMPointer = {
   chipSelect: number,

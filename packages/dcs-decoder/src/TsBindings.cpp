@@ -111,6 +111,13 @@ public:
         // return rv;
     }
 
+    DCSDecoderNative::StreamInfo getStreamInfo(uint32_t stream) {
+        DCSDecoder::ROMPointer ptr = decoder.MakeROMPointer(stream);
+        DCSDecoderNative::StreamInfo info = decoder.GetStreamInfo(ptr);
+
+        return info;
+    }
+
     Uint8Array extractStream(uint32_t stream) {
         DCSDecoder::ROMPointer ptr = decoder.MakeROMPointer(stream);
         DCSDecoderNative::StreamInfo info = decoder.GetStreamInfo(ptr);
@@ -173,7 +180,13 @@ EMSCRIPTEN_BINDINGS(dcs_decoder_wasm) {
     .field("chipSelect", &DCSDecoder::ROMPointer::chipSelect)
     .field("p", (uint32_t DCSDecoder::ROMPointer::*) &DCSDecoder::ROMPointer::p)
   ;
-  // const unsigned char *DCSDecoder::ROMPointer::*
+  
+  value_object<DCSDecoderNative::StreamInfo>("DCSDecoderNativeStreamInfo")
+    .field("nFrames", &DCSDecoderNative::StreamInfo::nFrames)
+    .field("nBytes", &DCSDecoderNative::StreamInfo::nBytes)
+    .field("formatType", &DCSDecoderNative::StreamInfo::formatType)
+    .field("formatSubType", &DCSDecoderNative::StreamInfo::formatSubType)
+  ;
 
   class_<DCSDecoderWasm>("DCSDecoderWasm")
     .constructor<>()
@@ -187,6 +200,7 @@ EMSCRIPTEN_BINDINGS(dcs_decoder_wasm) {
     .function("getSignature", &DCSDecoderWasm::getSignature)
     .function("getMaxTrackNumber", &DCSDecoderWasm::getMaxTrackNumber)
     .function("listStreams", &DCSDecoderWasm::listStreams)
+    .function("getStreamInfo", &DCSDecoderWasm::getStreamInfo)
     .function("extractStream", &DCSDecoderWasm::extractStream)
     ;
 
