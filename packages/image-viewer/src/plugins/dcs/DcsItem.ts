@@ -2,11 +2,12 @@ import DcsDecoder from '@tinktinp/dcs-decoder';
 
 import { BasePluginItem, type PluginItem } from '../../plugin/plugin';
 import { makeDcsElementAudio } from './DcsElement';
+import type { DcsRomSet } from './getRomSet';
 
 export interface DcsItemProps {
     id: string;
     label: string;
-    roms: File[];
+    roms: DcsRomSet[];
 }
 export class DcsItem
     extends BasePluginItem
@@ -14,7 +15,7 @@ export class DcsItem
 {
     id: string;
     label: string;
-    roms: File[];
+    roms: DcsRomSet[];
     decoder: InstanceType<typeof DcsDecoder.DCSDecoderWasm>;
 
     constructor({ id, label, roms }: DcsItemProps) {
@@ -28,7 +29,6 @@ export class DcsItem
     }
 
     async unload() {
-        // TODO: actually call this
         this.decoder.delete();
     }
 
@@ -71,8 +71,8 @@ async function loadRoms(item: DcsItem) {
     const { decoder, roms } = item;
 
     for (const rom of roms) {
-        const romNumber = getRomNumber(rom);
-        decoder.addRom(romNumber, new Uint8Array(await rom.arrayBuffer()));
+        const romNumber = rom.romNumber;
+        decoder.addRom(romNumber, new Uint8Array(await rom.file.arrayBuffer()));
         // console.log(
         //     'added rom ',
         //     rom.webkitRelativePath,
@@ -85,17 +85,12 @@ async function loadRoms(item: DcsItem) {
     if (checkRomsResult === 1) {
         decoder.softBoot();
         const sig = decoder.getSignature();
-        console.log({sig});
+        console.log({ sig });
         const maxTrackNumber = decoder.getMaxTrackNumber();
-        console.log({maxTrackNumber});
+        console.log({ maxTrackNumber });
         const streams: number[] = decoder.listStreams();
-        console.log('streams', streams);
+        // console.log('streams', streams);
         return { sig, maxTrackNumber, streams };
     }
     return { sig: '', maxTrackNumber: 0, streams: [] };
-}
-
-function getRomNumber(rom: File): number {
-    const match = rom.name.match(/[.][uU]([0-9])$/);
-    return Number.parseInt(match?.[1] as string);
 }
