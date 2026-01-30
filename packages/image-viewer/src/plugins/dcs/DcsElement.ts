@@ -1,6 +1,7 @@
 import type { PluginElementAudio } from '../../plugin/plugin';
 import { toHex } from '../../utils/toHex';
 import type { DcsItem } from './DcsItem';
+import { dcsStreamDetails } from './DcsStreamDetails';
 
 export interface DcsElementAudio
     extends PluginElementAudio,
@@ -24,6 +25,9 @@ export function makeDcsElementAudio(
         name: `Stream #${streamIdx} ${toHex(streamId)}`,
         async toWav() {
             return elementToWav(this);
+        },
+        details() {
+            return dcsStreamDetails(this);
         },
     };
 }

@@ -27,6 +27,7 @@ export function Sidebar({ imageLibrary, mode, modeData }: SidebarProps) {
     return (
         <>
             <Download imageLibrary={imageLibrary} />
+            <SelectAllButton />
             <SettingsPanel mode={mode} />
             {imageLibrary && (
                 <ImageLibrarySidebar imageLibrary={imageLibrary} />
@@ -92,4 +93,12 @@ export function ImageLibrarySidebar({
             ))}
         </>
     );
+}
+
+function doSelectAll() {
+    document.querySelectorAll('input[type=checkbox]').forEach((cb) => (cb as HTMLElement).click());
+}
+
+function SelectAllButton() {
+    return <button type="button" onClick={doSelectAll}>Select All</button>;
 }
