@@ -52,8 +52,8 @@ public:
 
     void addRom(int romNumber, Uint8Array data) {
         int byteLength = data["byteLength"].as<int>();
-        val console = val::global("console");
-        console.call<void>("log", val("foo"), data);
+        // val console = val::global("console");
+        // console.call<void>("log", val("foo"), data);
 
         // Create a new c++ vec, inside a vec of vecs, to hold the rom data.
         // We have to keep a copy of the data because `AddROM` does not
@@ -131,7 +131,8 @@ public:
         *(uint32_t*)(buffer.data() + 40) = streamBytes;
 
         const int channel = 0;
-        const int mixingLevel = 0x64;
+        // const int mixingLevel = 0x64;
+        const int mixingLevel = 0xff;
         decoder.LoadAudioStream(channel, ptr, mixingLevel);
 
         int samplesNeeded = streamBytes / 2;
