@@ -138,8 +138,10 @@ public:
         *(uint32_t*)(buffer.data() + 40) = streamBytes;
 
         const int channel = 0;
-        // const int mixingLevel = 0x64;
-        const int mixingLevel = 0xff;
+        const int mixingLevel = 0x64;
+        // TODO: make this adjustable!
+        //const int mixingLevel = 0x7f;
+        //const int mixingLevel = 0xff;
         decoder.LoadAudioStream(channel, ptr, mixingLevel);
 
         int samplesNeeded = streamBytes / 2;
