@@ -1,13 +1,19 @@
 import DcsDecoder from '@tinktinp/dcs-decoder';
 
 import { BasePluginItem, type PluginItem } from '../../plugin/plugin';
+import { type BnkInfo, type DcsStreamDetailsBnk, getStreams, parseBnk } from './bnk';
 import { makeDcsElementAudio } from './DcsElement';
 import type { DcsRomSet } from './getRomSet';
+
+export type DcsType = 'romset' | 'bnk';
+
+export type DcsItemInfo = DcsItemInfoRomset | DcsItemInfoBnk;
 
 export interface DcsItemProps {
     id: string;
     label: string;
     roms: DcsRomSet[];
+    dcsType: DcsType;
 }
 export class DcsItem
     extends BasePluginItem
@@ -16,13 +22,17 @@ export class DcsItem
     id: string;
     label: string;
     roms: DcsRomSet[];
+    dcsType: DcsType;
     decoder: InstanceType<typeof DcsDecoder.DCSDecoderWasm>;
+    itemInfo?: DcsItemInfo;
+    itemInfoPromise?: Promise<DcsItemInfo>;
 
-    constructor({ id, label, roms }: DcsItemProps) {
+    constructor({ id, label, roms, dcsType }: DcsItemProps) {
         super();
         this.id = id;
         this.label = label;
         this.roms = roms;
+        this.dcsType = dcsType;
 
         this.decoder = new DcsDecoder.DCSDecoderWasm();
         this.decoder.setMasterVolume(255);
@@ -33,7 +43,13 @@ export class DcsItem
     }
 
     async loadElements() {
-        const { streams, sig } = await loadRoms(this);
+        if (this.itemInfoPromise === undefined) {
+            this.itemInfoPromise =
+                this.dcsType === 'bnk' ? loadBnk(this) : loadRoms(this);
+        }
+        this.itemInfo = await this.itemInfoPromise;
+
+        const { streams, sig } = this.itemInfo;
 
         this.dispatchElementsLoaded([
             {
@@ -59,6 +75,7 @@ export class DcsItem
                     sectionId: 'streams',
                     streamId: s,
                     streamIdx: idx,
+                    streamsDetails: (this?.itemInfo as DcsItemInfoBnk)?.streamsDetails?.[idx]
                 }),
             ),
         );
@@ -67,7 +84,14 @@ export class DcsItem
     }
 }
 
-async function loadRoms(item: DcsItem) {
+export interface DcsItemInfoRomset {
+    type: 'romset';
+    sig: string;
+    maxTrackNumber: number;
+    streams: number[];
+}
+
+async function loadRoms(item: DcsItem): Promise<DcsItemInfoRomset> {
     const { decoder, roms } = item;
 
     for (const rom of roms) {
@@ -90,7 +114,50 @@ async function loadRoms(item: DcsItem) {
         console.log({ maxTrackNumber });
         const streams: number[] = decoder.listStreams();
         // console.log('streams', streams);
-        return { sig, maxTrackNumber, streams };
+        return { type: 'romset', sig, maxTrackNumber, streams };
     }
-    return { sig: '', maxTrackNumber: 0, streams: [] };
+    return { type: 'romset', sig: '', maxTrackNumber: 0, streams: [] };
+}
+
+export interface DcsItemInfoBnk {
+    type: 'bnk';
+    sig: string;
+    maxTrackNumber: number;
+    streams: number[];
+    streamsDetails: DcsStreamDetailsBnk[];
+    bnkInfo: BnkInfo;
+    filePtrInWasmHeap: number;
+}
+
+async function loadBnk(item: DcsItem): Promise<DcsItemInfoBnk> {
+    const { decoder, roms } = item;
+    const rom = roms[0];
+
+    decoder.softBoot();
+
+    const buffer = new Uint8Array(await rom.file.arrayBuffer());
+    const filePtrInWasmHeap = DcsDecoder._malloc(buffer.byteLength);
+    // console.log('loadBnk', { filePtrInWasmHeap });
+    DcsDecoder.HEAPU8.set(buffer, filePtrInWasmHeap);
+
+    const bnkInfo = parseBnk(buffer);
+    const { sig, trackProgramCount } = bnkInfo;
+    const streamsDetails = getStreams(bnkInfo);
+    const streams = streamsDetails.map(
+        (s) => s.streamPointer + filePtrInWasmHeap,
+    );
+
+    // // const stream = ptr + 0x254;
+    // const stream = ptr + 0x577f + 0x11b;
+    // console.log({ ptr, stream });
+
+    return {
+        type: 'bnk',
+        sig,
+        maxTrackNumber: trackProgramCount - 1,
+        streams,
+        streamsDetails,
+        bnkInfo,
+        filePtrInWasmHeap,
+    };
 }

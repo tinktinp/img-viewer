@@ -118,8 +118,26 @@ public:
         return info;
     }
 
+    DCSDecoderNative::StreamInfo getStreamInfoFromPtr(long p) {
+        DCSDecoder::ROMPointer ptr = DCSDecoder::ROMPointer(0, (const uint8_t *)p);
+        DCSDecoderNative::StreamInfo info = decoder.GetStreamInfo(ptr);
+
+        return info;
+    }
+
     Uint8Array extractStream(uint32_t stream) {
         DCSDecoder::ROMPointer ptr = decoder.MakeROMPointer(stream);
+
+        return extractStreamFromRomPtr(ptr);
+    }
+
+    Uint8Array extractStreamFromPtr(long p) {
+        DCSDecoder::ROMPointer ptr = DCSDecoder::ROMPointer(0, (const uint8_t *)p);
+
+        return extractStreamFromRomPtr(ptr);
+    }
+
+    Uint8Array extractStreamFromRomPtr(DCSDecoder::ROMPointer ptr) {
         DCSDecoderNative::StreamInfo info = decoder.GetStreamInfo(ptr);
         const int samplesPerFrame = 240;
         const int bytesPerSample = 2;
@@ -203,7 +221,9 @@ EMSCRIPTEN_BINDINGS(dcs_decoder_wasm) {
     .function("getMaxTrackNumber", &DCSDecoderWasm::getMaxTrackNumber)
     .function("listStreams", &DCSDecoderWasm::listStreams)
     .function("getStreamInfo", &DCSDecoderWasm::getStreamInfo)
+    .function("getStreamInfoFromPtr", &DCSDecoderWasm::getStreamInfoFromPtr)
     .function("extractStream", &DCSDecoderWasm::extractStream)
+    .function("extractStreamFromPtr", &DCSDecoderWasm::extractStreamFromPtr, allow_raw_pointer<arg<1>>())
     ;
 
     register_vector<uint8_t>("VectorUint8");
@@ -211,5 +231,6 @@ EMSCRIPTEN_BINDINGS(dcs_decoder_wasm) {
 
     register_type<Uint8Array>("Uint8Array");
 
+    //value_object<uint8_t>("Uint8t");
 }
 

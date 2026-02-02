@@ -29,7 +29,11 @@ export async function cacheAndBlobUrl({
         cachedUrl = url;
     }
 
-    const name = new URL(url, import.meta.url).pathname;
+    const name = new URL(
+        /* webpackIgnore: true */
+        url,
+        import.meta.url,
+    ).pathname;
     // could just use new Blob() here, but I like giving it the name, just in case
     // something decides to use it someday
     const blob = new File([data as BlobPart], name, {

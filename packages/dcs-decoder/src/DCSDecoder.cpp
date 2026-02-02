@@ -204,20 +204,29 @@ const char *DCSDecoder::GetGameTitle(GameID id)
 	return "[Unknown]";
 }
 
+uint16_t Read16Be(const uint8_t* &src) {
+	uint16_t hi = *src++;
+	return (hi << 8) | *src++;
+};
+uint16_t Read16Le(const uint8_t* &src) {
+	uint16_t low = *src++;
+	uint16_t hi = *src++;
+	return (hi << 8) | low;
+};
+
 uint32_t DCSDecoder::FindCatalog(const uint8_t *u2, size_t u2size)
 {
 	// try the known offsets
-	static const uint32_t offsets[] ={ 0x3000, 0x4000, 0x6000, 0x9000 };
+	static const uint32_t offsets[] ={ 0x3000, 0x4000, 0x6000, 0x9000, 0x10000 };
 	for (int i = 0 ; i < static_cast<int>(_countof(offsets)); ++i)
 	{
 		// The catalog always starts with the three-UINT16 entry
 		// for U2 itself, with its size in 4K units, its ROM bank
 		// select code, and its checksum.  The bank select and
 		// checksum are both always zero for U2.
-		auto Read16 = [](const uint8_t* &src) {
-			uint16_t hi = *src++;
-			return (hi << 8) | *src++;
-		};
+		bool le = offsets[i] == 0x10000;
+
+		auto Read16 = le ? Read16Le : Read16Be;
 		const uint8_t *src = u2 + offsets[i];
 		uint32_t size = Read16(src) * 4096;
 		uint16_t chipSel = Read16(src) >> 8;
@@ -293,7 +302,7 @@ uint8_t DCSDecoder::CheckROMs()
 	// have the right location and thus know which system version
 	// this is.  The odds of random data matching the checksum
 	// are low.
-	static const uint32_t offsets[] ={ 0x3000, 0x4000, 0x6000, 0x9000 };
+	static const uint32_t offsets[] ={ 0x3000, 0x4000, 0x6000, 0x9000, 0x10000 };
 	for (int i = 0 ; i < static_cast<int>(_countof(offsets)); ++i)
 	{
 		// Try interpreting the data at this offset as though it
@@ -316,6 +325,8 @@ uint8_t DCSDecoder::CheckROMs()
 		// bytes, masked with $FF, in the low byte.  If there are
 		// fewer than 8 ROMs, the table is only partially populated,
 		// with the last entry marked with $0000 in the length field.
+		bool le = offsets[i] == 0x10000;
+		auto Read16 = le ? Read16Le : Read16Be;
 		const uint8_t *src = ROM[0].data + offsets[i];
 		int nRomsInTable = 0;
 		int nValidated = 0;
@@ -323,10 +334,6 @@ uint8_t DCSDecoder::CheckROMs()
 		for (int entryNo = 0 ; entryNo < 9 ; ++entryNo)
 		{
 			// read the next three UINT16's
-			auto Read16 = [](const uint8_t* &src) {
-				uint16_t hi = *src++;
-				return (hi << 8) | *src++;
-			};
 			uint32_t size = Read16(src) * 4096;
 			uint16_t chipSel = Read16(src) >> 8;
 			uint16_t ck = Read16(src);
@@ -343,6 +350,10 @@ uint8_t DCSDecoder::CheckROMs()
 			// to the smaller ROM banking window on the DCS95 boards.
 			if (offsets[i] == 0x6000 || offsets[i] == 0x9000)
 				chipSel >>= 1;
+			// For `0x1'0000`, it's shifted left by two more bits!
+			// (And also in LE, but we handled that above)
+			if (offsets[i] == 0x10000)
+				chipSel >>= 2;
 
 			// if the chip select looks valid, compare the length
 			// and checksum
@@ -370,7 +381,7 @@ uint8_t DCSDecoder::CheckROMs()
 			// version can be determined from the location of the catalog:
 			// if it's $06000, it's for the DCS-95 boards, otherwise it's
 			// for the original DCS audio board.
-			if (offsets[i] == 0x6000 || offsets[i] == 0x9000)
+			if (offsets[i] == 0x6000 || offsets[i] == 0x9000 || offsets[i] == 0x10000)
 			{
 				// Offset $06000 is always used for the DCS-95 board.  This 
 				// also means that the software must be the 1995 version 

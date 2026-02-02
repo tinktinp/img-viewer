@@ -38,6 +38,8 @@ const SharedArrayBuffer = globalThis.SharedArrayBuffer
     ? globalThis.SharedArrayBuffer
     : globalThis.ArrayBuffer;
 
+const textDecoder = new TextDecoder('iso-8859-1');
+
 /**
  * a buffer and an "offset".
  *
@@ -280,6 +282,52 @@ export class BufferPtr<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> {
         const ret = this.getAsBuffer(size);
         this.offset += size;
         return ret;
+    }
+
+    /**
+     * Parses an array of C strings (null terminated char arrays). The strings
+     * must by one after another in memory and separated by nul bytes.
+     *
+     * The offset of `this` will be after the last byte.
+     *
+     * @returns array of strings, strings do not include the null byte
+     */
+    getCStringArray(len?: number) {
+        const start = this.offset;
+        const rv: string[] = [];
+        let strbuf = '';
+
+        while (
+            !this.atEnd() &&
+            (len === undefined || this.offset <= start + len)
+        ) {
+            const char = this.getAndInc();
+            if (char === 0) {
+                rv.push(strbuf);
+                strbuf = '';
+            } else {
+                strbuf += String.fromCharCode(char);
+            }
+        }
+
+        return rv;
+    }
+
+    getCString(len?: number) {
+        let nulByteIdx = this.buffer.indexOf(0, this.offset);
+        if (len !== undefined && len < (nulByteIdx - this.offset)) {
+            nulByteIdx = len + this.offset;
+        }
+        const buffy = this.buffer.slice(this.offset, nulByteIdx);
+        this.offset = nulByteIdx + 1;
+        return textDecoder.decode(buffy as unknown as Uint8Array);
+    }
+
+    getPascalString() {
+        const len = this.getAndInc();
+        const buffy = this.buffer.slice(this.offset, this.offset + len);
+        this.offset += len;
+        return textDecoder.decode(buffy as unknown as Uint8Array);
     }
 }
 
