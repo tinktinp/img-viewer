@@ -25,7 +25,7 @@ export class DcsPlugin implements Plugin<DcsItem> {
                     dcsType: 'romset',
                 });
                 return [item];
-            } else if (lcfname.endsWith('.bnk')) {
+            } else if (lcfname.endsWith('.bnk') || lcfname.endsWith('.snd4')) {
                 const item = new DcsItem({
                     id: getNextItemId(),
                     label: `${itemLabelPrefix}/${f.webkitRelativePath}`,

@@ -55,6 +55,45 @@ export function parseBnk(buffer: Uint8Array): BnkInfo {
     return rv;
 }
 
+/**
+ * Parse a SND4 "file" or section from Wargods
+ */
+export function parseSnd4(buffer: Uint8Array): BnkInfo {
+    const ptr = new BufferPtr(buffer);
+
+    // Not sure what this is, but it seems to increase by one per snd4, e.g.
+    // 0x1072, 0x1073, 0x1074 0x1075, 0x1076 for the first 5 SND4 sections at 0x337_bc00
+    const unk = ptr.getAndInc32();
+
+    const sig = toHex(unk);
+
+    const trackProgramCount = ptr.getAndInc32();
+    const tracksAndAudioLen = ptr.getAndInc32();
+
+    const trackProgramTableSize = trackProgramCount * 4;
+    const trackProgramBaseOffset = ptr.offset + trackProgramTableSize;
+
+    const trackProgramTable = parseTrackProgramIndex(ptr, trackProgramCount);
+
+    trackProgramTable.forEach((tpi) => {
+        if (tpi.index !== 0xffff_ffff) {
+            tpi.trackProgram = parseTrackProgram(
+                buffer,
+                tpi.index + trackProgramBaseOffset,
+            );
+        }
+    });
+
+    const rv = {
+        sig,
+        trackProgramCount,
+        tracksAndAudioLen,
+        trackProgramTable,
+    };
+    console.log(rv);
+    return rv;
+}
+
 export type TrackProgramType =
     | 'byte-code-program'
     | 'deferred-track'
@@ -136,6 +175,8 @@ export enum Op {
     NoOp = 0xd,
     StartLoop = 0xe,
     EndLoop = 0xf,
+    Unknown0x10 = 0x10,
+    Unknown0x11 = 0x11,
 }
 
 const opArgSize = {
@@ -155,6 +196,8 @@ const opArgSize = {
     [Op.NoOp]: 0,
     [Op.StartLoop]: 1,
     [Op.EndLoop]: 0,
+    [Op.Unknown0x10]: 2,
+    [Op.Unknown0x11]: 4,
 };
 
 export interface TrackProgramOpCode {
@@ -164,7 +207,7 @@ export interface TrackProgramOpCode {
 
 function parseByteCodeTrackProgram(ptr: BufferPtr) {
     const ops: OpAndArgs[] = [];
-    while (true) {
+    while (!ptr.atEnd() && Number.isFinite(ptr.offset)) {
         const op = parseByteCodeOpCode(ptr);
         ops.push(op);
         if (op.op === Op.EndTrack) {

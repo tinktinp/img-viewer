@@ -1,7 +1,13 @@
 import DcsDecoder from '@tinktinp/dcs-decoder';
 
 import { BasePluginItem, type PluginItem } from '../../plugin/plugin';
-import { type BnkInfo, type DcsStreamDetailsBnk, getStreams, parseBnk } from './bnk';
+import {
+    type BnkInfo,
+    type DcsStreamDetailsBnk,
+    getStreams,
+    parseBnk,
+    parseSnd4,
+} from './bnk';
 import { makeDcsElementAudio } from './DcsElement';
 import type { DcsRomSet } from './getRomSet';
 
@@ -75,7 +81,8 @@ export class DcsItem
                     sectionId: 'streams',
                     streamId: s,
                     streamIdx: idx,
-                    streamsDetails: (this?.itemInfo as DcsItemInfoBnk)?.streamsDetails?.[idx]
+                    streamsDetails: (this?.itemInfo as DcsItemInfoBnk)
+                        ?.streamsDetails?.[idx],
                 }),
             ),
         );
@@ -140,7 +147,12 @@ async function loadBnk(item: DcsItem): Promise<DcsItemInfoBnk> {
     // console.log('loadBnk', { filePtrInWasmHeap });
     DcsDecoder.HEAPU8.set(buffer, filePtrInWasmHeap);
 
-    const bnkInfo = parseBnk(buffer);
+    let bnkInfo: BnkInfo;
+    if (item.roms[0].file.name.toLowerCase().endsWith('snd4')) {
+        bnkInfo = parseSnd4(buffer);
+    } else {
+        bnkInfo = parseBnk(buffer);
+    }
     const { sig, trackProgramCount } = bnkInfo;
     const streamsDetails = getStreams(bnkInfo);
     const streams = streamsDetails.map(
