@@ -3,7 +3,7 @@ packages:
 
 catalog:
   '@biomejs/biome': 2.0.6
-  '@rsbuild/core': ^1.4.3
+  '@rsbuild/core': ^1.7.2
   '@types/node': ^24.0.14
   typescript: ^5.9.3
 

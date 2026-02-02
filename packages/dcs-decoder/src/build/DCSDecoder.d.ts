@@ -63,6 +63,8 @@ export interface DCSDecoderWasm extends ClassHandle {
   addRom(_0: number, _1: Uint8Array): void;
   getStreamInfo(_0: number): DCSDecoderNativeStreamInfo;
   extractStream(_0: number): Uint8Array;
+  getStreamInfoFromPtr(_0: number): DCSDecoderNativeStreamInfo;
+  extractStreamFromPtr(_0: number): Uint8Array;
   getSignature(): string;
   listStreams(): any;
 }
