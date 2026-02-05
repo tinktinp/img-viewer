@@ -42,12 +42,13 @@ export class DcsPlugin implements Plugin<DcsItem> {
                 });
                 return [item];
             } else if (
-                lcfname.startsWith('wargods_11-07-1996') ||
-                lcfname.startsWith('wargods_08-15-1996') ||
-                lcfname.startsWith('wargods_12-11-1995')
+                lcfname.startsWith('wargods_')
             ) {
-                return getWargodsItems(f);
+                const rv = await getWargodsItems(f);
+                console.log('getWargodsItems(%s) returned:', lcfname, rv);
+                return rv;
             } else {
+                console.log('"%s" is not a name I recognize!', lcfname)
                 return [];
             }
         });

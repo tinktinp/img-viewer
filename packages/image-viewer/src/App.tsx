@@ -29,6 +29,7 @@ import { MktN64Roms } from './mkt-n64-roms/mktN64Roms';
 import { PaletteComponent } from './PaletteComponent';
 import type { Plugin, PluginItem } from './plugin/plugin';
 import { PluginItemComponent } from './plugin-react/PluginImages';
+import { DcsPlugin } from './plugins/dcs/DcsPlugin';
 import { ScriptListLibrary } from './ScriptList';
 import { clearSelection } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
@@ -37,7 +38,8 @@ import { Sidebar } from './Sidebar';
 import { Umk3IosPlugin } from './umk3-ios/Umk3IosPlugin';
 import { useImageLibrary } from './useImageLibrary';
 import { sortNames } from './utils/sortNames';
-import { DcsPlugin } from './plugins/dcs/DcsPlugin';
+
+console.log('There is no knowledge that is not power. Feb 4th, 2026.');
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends React.HTMLAttributes<T> {
