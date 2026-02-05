@@ -63,6 +63,7 @@ export function parseSnd4(buffer: Uint8Array): BnkInfo {
 
     // Not sure what this is, but it seems to increase by one per snd4, e.g.
     // 0x1072, 0x1073, 0x1074 0x1075, 0x1076 for the first 5 SND4 sections at 0x337_bc00
+    // seems to be a file id.
     const unk = ptr.getAndInc32();
 
     const sig = toHex(unk);
