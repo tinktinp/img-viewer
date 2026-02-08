@@ -13,7 +13,7 @@ import {
     RGBA_PVRTC_4BPPV1_Format,
     SRGBColorSpace,
 } from 'three';
-import type { PluginElementMesh } from '../plugin';
+import type { PluginElementMesh } from '../../plugin';
 import type { Umk3IosItem } from './Umk3IosItem';
 import type { Mesh } from './Umk3IosMeshSetParser';
 import { findTexture, loadTexture, uncompressPvr } from './umk3-textures';

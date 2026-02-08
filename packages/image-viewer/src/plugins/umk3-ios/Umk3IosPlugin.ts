@@ -1,7 +1,7 @@
 import type { Texture } from 'three';
-import type { Plugin } from '../plugin';
+import type { Plugin } from '../../plugin';
 import { Umk3IosItem } from './Umk3IosItem';
-import { sortNames } from '../utils/sortNames';
+import { sortNames } from '../../utils/sortNames';
 
 // let idNum = 0;
 // function getNextItemId() {

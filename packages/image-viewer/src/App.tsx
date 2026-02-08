@@ -35,7 +35,7 @@ import { clearSelection } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
 import { Sidebar } from './Sidebar';
-import { Umk3IosPlugin } from './umk3-ios/Umk3IosPlugin';
+import { Umk3IosPlugin } from './plugins/umk3-ios/Umk3IosPlugin';
 import { useImageLibrary } from './useImageLibrary';
 import { sortNames } from './utils/sortNames';
 

@@ -1,5 +1,5 @@
-import type { PluginElementImage } from '../plugin';
-import { encodeRgba32AsPng } from '../toPng';
+import type { PluginElementImage } from '../../plugin';
+import { encodeRgba32AsPng } from '../../toPng';
 import type { Umk3IosItem } from './Umk3IosItem';
 import type { TextureObj } from './Umk3IosPlugin';
 import { uncompressPvr } from './umk3-textures';

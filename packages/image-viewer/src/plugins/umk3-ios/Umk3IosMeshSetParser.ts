@@ -4,7 +4,7 @@
  * Based on ermaccer's awesome https://github.com/ermaccer/UMK3IOS.MeshSetTool
  */
 
-import { BufferPtr } from '../asm/BufferPtr';
+import { BufferPtr } from '../../asm/BufferPtr';
 
 export interface Mesh {
     header: ModelHeader;

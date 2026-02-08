@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/complexity/useSimpleNumberKeys: <explanation> */
-import { BufferPtr } from '../asm/BufferPtr';
-import { toHex } from '../utils/toHex';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { toHex } from '../../utils/toHex';
 
 const pvrVersion = 0x03525650;
 const pvrVersionEndianMismatch = 0x50565203;
