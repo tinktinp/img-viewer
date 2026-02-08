@@ -2,8 +2,8 @@
 
 import { Console } from 'node:console';
 import minimist from 'minimist';
-import { dumpRomNode } from '../arcade-roms/roms-cli';
 import { dumpMk1Pc } from '../mk1-pc/mk1-pc';
+import { dumpRomNode } from '../plugins/arcade-roms/roms-cli';
 
 const logger = new Console(process.stdout);
 

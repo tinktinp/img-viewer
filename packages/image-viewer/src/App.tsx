@@ -7,7 +7,6 @@ import {
 } from 'react';
 import styles from './App.module.css';
 import { AppHeader, type FileItem, type UploadedFile } from './AppHeader';
-import { ArcadeRomsPlugin } from './arcade-roms/ArcadeRomsPlugin';
 import {
     type CategorizedFiles,
     type FileNameAndData,
@@ -29,6 +28,7 @@ import { MktN64Roms } from './mkt-n64-roms/mktN64Roms';
 import { PaletteComponent } from './PaletteComponent';
 import type { Plugin, PluginItem } from './plugin/plugin';
 import { PluginItemComponent } from './plugin-react/PluginImages';
+import { ArcadeRomsPlugin } from './plugins/arcade-roms/ArcadeRomsPlugin';
 import { DcsPlugin } from './plugins/dcs/DcsPlugin';
 import { ScriptListLibrary } from './ScriptList';
 import { clearSelection } from './Selection';

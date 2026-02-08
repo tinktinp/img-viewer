@@ -1,7 +1,7 @@
 // import { encodeBuffersAsPng } from '../toPng';
-import { encodeBuffersAsPng } from '../consume-worker';
-import type { PluginElementImage, PluginElementPalette } from '../plugin';
-import { toHex } from '../utils/toHex';
+import { encodeBuffersAsPng } from '../../consume-worker';
+import type { PluginElementImage, PluginElementPalette } from '../../plugin';
+import { toHex } from '../../utils/toHex';
 import type { ArcadeRomsItem } from './ArcadeRomsItem';
 import { type Metadata } from './roms';
 

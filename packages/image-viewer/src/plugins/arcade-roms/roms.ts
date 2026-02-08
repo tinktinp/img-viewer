@@ -1,6 +1,6 @@
 import { encode, type ImageData as PngImageData } from 'fast-png';
-import { BitBufferRom } from '../asm/BitBuffer';
-import { BufferPtr } from '../asm/BufferPtr';
+import { BitBufferRom } from '../../asm/BitBuffer';
+import { BufferPtr } from '../../asm/BufferPtr';
 import { dummyPalette } from './dummyPalette';
 
 const littleEndian = true;
@@ -248,7 +248,7 @@ export function dumpRomMetadata({
 }: DumpRomOptions): Metadata[] {
     const gfxLenInBits = gfxrom.byteLength * 8;
     const baseGfxAddr = mk1Mode ? 0x0200_0000 : 0;
-   
+
     const results: Metadata[] = scanForSprites(
         maincpu,
         baseGfxAddr,
