@@ -7,6 +7,24 @@ This is a plugin uses the [DCSExplorer](https://github.com/mjrgh/DCSExplorer) li
 
 > DCS (initials for Digital Compression System) consists of a family of proprietary digital audio compression formats, along with a run-time system tailored to the real-time event-driven playback environment of an arcade game.
 
+DCSExplorer was patched to support MK4.
+
+## Known to work
+- MK2
+- MK3
+- UMK3
+- MK4
+- NBA Hangtime
+- Carnevil
+- Wargods
+
+Img-viewer looks for files with certain names, such as `u2.rom`, `*.u2`, `su2.l1`, `*.bnk` (for Carnevil), and `wargods_` for Wargods.
+
+For Wargods, you need to use Mame's `chdman` to uncompress the `.chd` disk image first.
+
+For Carnevil, you need to extract the individual `*.bnk` files.
+
+For some romsets, it might be helpful to copy and rename just the sound roms to their own folder.
 
 ## wikipedia
 
