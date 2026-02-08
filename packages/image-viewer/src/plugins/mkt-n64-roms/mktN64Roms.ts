@@ -1,14 +1,14 @@
-import { BufferPtr } from '../asm/BufferPtr';
-import { mktN64ImageDecompressToPng } from '../consume-worker';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { mktN64ImageDecompressToPng } from '../../consume-worker';
 import {
     BasePluginItem,
     ElementsFinishedLoading,
     ElementsLoadedEvent,
     type Plugin,
     type PluginItem,
-} from '../plugin/plugin';
-import { type AniCmd, parseAniEntry } from '../utils/aniCmd';
-import { toHex } from '../utils/toHex';
+} from '../../plugin/plugin';
+import { type AniCmd, parseAniEntry } from '../../utils/aniCmd';
+import { toHex } from '../../utils/toHex';
 import { dummyPalette } from './dummy-palette';
 import { getRomInfo, n64RomMagic, type RomInfo } from './MktN64RomInfo';
 import {

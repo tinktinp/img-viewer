@@ -1,4 +1,4 @@
-import { toHex } from '../utils/toHex';
+import { toHex } from '../../utils/toHex';
 
 export const n64RomMagic = 0x8037_1240;
 const romInfo = [

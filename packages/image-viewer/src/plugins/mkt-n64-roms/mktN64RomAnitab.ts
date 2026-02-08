@@ -1,11 +1,11 @@
-import { BufferPtr } from '../asm/BufferPtr';
-import { mktN64GetImageInfo } from '../asm/decompressMktN64';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { mktN64GetImageInfo } from '../../asm/decompressMktN64';
 import {
     type AniCmd,
     type AniCmdWithFrameOffset,
     parseAniEntry,
-} from '../utils/aniCmd';
-import { toHex } from '../utils/toHex';
+} from '../../utils/aniCmd';
+import { toHex } from '../../utils/toHex';
 import {
     isValidPaletteAddr,
     paletteAddrToFileOffset,

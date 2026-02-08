@@ -1,5 +1,5 @@
-import type { PluginDetailsObj } from '../plugin/plugin';
-import { toHex } from '../utils/toHex';
+import type { PluginDetailsObj } from '../../plugin/plugin';
+import { toHex } from '../../utils/toHex';
 import type { MktN64RomElementImage } from './mktN64RomTypes';
 
 export async function mktN64RomImgDetails(

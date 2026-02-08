@@ -24,7 +24,7 @@ import { Layout, LayoutMain, LayoutSidebar } from './Layout';
 import { MktPcImages } from './MktPcImages';
 import { MklkImages } from './mklk/react/MklkImages';
 import { MktN64Images } from './mkt-n64/MktN64Images';
-import { MktN64Roms } from './mkt-n64-roms/mktN64Roms';
+import { MktN64Roms } from './plugins/mkt-n64-roms/mktN64Roms';
 import { PaletteComponent } from './PaletteComponent';
 import type { Plugin, PluginItem } from './plugin/plugin';
 import { PluginItemComponent } from './plugin-react/PluginImages';
