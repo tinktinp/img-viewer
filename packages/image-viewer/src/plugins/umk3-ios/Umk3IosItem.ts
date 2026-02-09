@@ -1,4 +1,4 @@
-import { BasePluginItem, type PluginItem } from '../plugin';
+import { BasePluginItem, type PluginItem } from '../../plugin';
 import { makeUmk3IosElementImage } from './Umk3IosMeshElement';
 import { parseUmk3IosMeshSet } from './Umk3IosMeshSetParser';
 import type { Umk3IosPlugin } from './Umk3IosPlugin';

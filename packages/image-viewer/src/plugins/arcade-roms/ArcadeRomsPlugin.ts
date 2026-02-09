@@ -1,4 +1,4 @@
-import type { Plugin } from '../plugin';
+import type { Plugin } from '../../plugin';
 import { ArcadeRomsItem } from './ArcadeRomsItem';
 import { supportedRoms } from './RomInfo';
 

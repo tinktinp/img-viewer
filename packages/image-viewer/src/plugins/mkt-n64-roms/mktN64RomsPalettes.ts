@@ -1,6 +1,6 @@
-import { BufferPtr } from '../asm/BufferPtr';
-import { processPaletteInFormatWithSize } from '../palettes/palettes';
-import { toHex } from '../utils/toHex';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { processPaletteInFormatWithSize } from '../../palettes/palettes';
+import { toHex } from '../../utils/toHex';
 import type { RomInfo } from './MktN64RomInfo';
 import { mktN64RomPaletteDetails } from './mktN64RomPaletteDetails';
 import type {

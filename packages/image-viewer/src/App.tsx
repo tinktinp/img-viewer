@@ -7,7 +7,6 @@ import {
 } from 'react';
 import styles from './App.module.css';
 import { AppHeader, type FileItem, type UploadedFile } from './AppHeader';
-import { ArcadeRomsPlugin } from './arcade-roms/ArcadeRomsPlugin';
 import {
     type CategorizedFiles,
     type FileNameAndData,
@@ -25,17 +24,18 @@ import { Layout, LayoutMain, LayoutSidebar } from './Layout';
 import { MktPcImages } from './MktPcImages';
 import { MklkImages } from './mklk/react/MklkImages';
 import { MktN64Images } from './mkt-n64/MktN64Images';
-import { MktN64Roms } from './mkt-n64-roms/mktN64Roms';
+import { MktN64Roms } from './plugins/mkt-n64-roms/mktN64Roms';
 import { PaletteComponent } from './PaletteComponent';
 import type { Plugin, PluginItem } from './plugin/plugin';
 import { PluginItemComponent } from './plugin-react/PluginImages';
+import { ArcadeRomsPlugin } from './plugins/arcade-roms/ArcadeRomsPlugin';
 import { DcsPlugin } from './plugins/dcs/DcsPlugin';
 import { ScriptListLibrary } from './ScriptList';
 import { clearSelection } from './Selection';
 import { SequenceListLibrary } from './SequenceList';
 import { SettingsProvider } from './Settings';
 import { Sidebar } from './Sidebar';
-import { Umk3IosPlugin } from './umk3-ios/Umk3IosPlugin';
+import { Umk3IosPlugin } from './plugins/umk3-ios/Umk3IosPlugin';
 import { useImageLibrary } from './useImageLibrary';
 import { sortNames } from './utils/sortNames';
 

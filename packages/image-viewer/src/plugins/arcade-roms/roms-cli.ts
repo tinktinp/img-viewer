@@ -1,9 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { BufferPtr } from '../asm/BufferPtr';
-import { processPaletteInFormat } from '../palettes/palettes';
-import { toHex } from '../utils/toHex';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { processPaletteInFormat } from '../../palettes/palettes';
+import { toHex } from '../../utils/toHex';
 import { dummyPalette } from './dummyPalette';
 import {
     decodeAsRaw,
@@ -44,7 +44,7 @@ export function dumpRomNode({
     })[] = dumpRomMetadata({
         maincpu: maincpu.buffer,
         gfxrom: gfxrom.buffer,
-        mk1Mode: mk1
+        mk1Mode: mk1,
     });
 
     // const gfxLenInBits = gfxrom.byteLength * 8;

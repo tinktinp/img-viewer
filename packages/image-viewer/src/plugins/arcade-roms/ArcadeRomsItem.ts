@@ -1,6 +1,10 @@
-import { BufferPtr } from '../asm/BufferPtr';
-import { processPaletteInFormat } from '../palettes/palettes';
-import { BasePluginItem, type PluginElement, type PluginItem } from '../plugin';
+import { BufferPtr } from '../../asm/BufferPtr';
+import { processPaletteInFormat } from '../../palettes/palettes';
+import {
+    BasePluginItem,
+    type PluginElement,
+    type PluginItem,
+} from '../../plugin';
 import {
     type ArcadeRomsElementPalette,
     makeArcadeRomsElementImage,

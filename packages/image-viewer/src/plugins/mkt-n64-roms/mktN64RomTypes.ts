@@ -3,11 +3,11 @@ import type {
     PluginElementPalette,
     PluginItem,
     PluginItemProps,
-} from '../plugin/plugin';
+} from '../../plugin/plugin';
 import type {
     AniCmd,
     AniCmdWithFrameOffset,
-} from '../utils/aniCmd';
+} from '../../utils/aniCmd';
 import type { RomInfo } from './MktN64RomInfo';
 
 export type MktN64RomItemType = 'character' | 'background';
